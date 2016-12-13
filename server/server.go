@@ -18,6 +18,7 @@ import (
 	"github.com/tylerb/graceful"
 	"golang.org/x/net/context"
 
+	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
 )
 
@@ -52,26 +53,26 @@ func DefaultConfig() Config {
 func New(config Config) (Server, error) {
 	// Dependencies.
 	if config.Endpoints == nil {
-		return nil, maskAnyf(invalidConfigError, "endpoints must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "endpoints must not be empty")
 	}
 	if config.ErrorEncoder == nil {
-		return nil, maskAnyf(invalidConfigError, "error encoder must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "error encoder must not be empty")
 	}
 	if config.Logger == nil {
-		return nil, maskAnyf(invalidConfigError, "logger must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "logger must not be empty")
 	}
 	if config.RequestFuncs == nil {
-		return nil, maskAnyf(invalidConfigError, "request funcs must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "request funcs must not be empty")
 	}
 
 	// Settings.
 	if config.ListenAddress == "" {
-		return nil, maskAnyf(invalidConfigError, "listen address must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "listen address must not be empty")
 	}
 
 	listenURL, err := url.Parse(config.ListenAddress)
 	if err != nil {
-		return nil, maskAnyf(invalidConfigError, err.Error())
+		return nil, microerror.MaskAnyf(invalidConfigError, err.Error())
 	}
 
 	newServer := &server{

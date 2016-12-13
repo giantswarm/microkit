@@ -2,6 +2,8 @@ package server
 
 import (
 	"net/http"
+
+	microerror "github.com/giantswarm/microkit/error"
 )
 
 // ResponseWriterConfig represents the configuration used to create a new
@@ -26,10 +28,10 @@ func DefaultResponseWriterConfig() ResponseWriterConfig {
 func NewResponseWriter(config ResponseWriterConfig) (ResponseWriter, error) {
 	// Settings.
 	if config.ResponseWriter == nil {
-		return nil, maskAnyf(invalidConfigError, "response writer must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "response writer must not be empty")
 	}
 	if config.StatusCode == 0 {
-		return nil, maskAnyf(invalidConfigError, "status code must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "status code must not be empty")
 	}
 
 	newResponseWriter := &responseWriter{
