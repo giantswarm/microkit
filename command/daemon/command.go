@@ -8,6 +8,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/spf13/cobra"
 
+	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
 	"github.com/giantswarm/microkit/server"
 )
@@ -33,10 +34,10 @@ func DefaultConfig() Config {
 func New(config Config) (Command, error) {
 	// Dependencies.
 	if config.Logger == nil {
-		return nil, maskAnyf(invalidConfigError, "logger must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "logger must not be empty")
 	}
 	if config.ServerFactory == nil {
-		return nil, maskAnyf(invalidConfigError, "server factory must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "server factory must not be empty")
 	}
 
 	config.Logger = kitlog.NewContext(config.Logger).With("package", "command/daemon")

@@ -5,6 +5,8 @@ import (
 	"runtime"
 
 	"github.com/spf13/cobra"
+
+	microerror "github.com/giantswarm/microkit/error"
 )
 
 // Config represents the configuration used to create a new version command.
@@ -34,19 +36,19 @@ func DefaultConfig() Config {
 func New(config Config) (Command, error) {
 	// Settings.
 	if config.Description == "" {
-		return nil, maskAnyf(invalidConfigError, "description commit must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "description commit must not be empty")
 	}
 	if config.GitCommit == "" {
-		return nil, maskAnyf(invalidConfigError, "git commit must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "git commit must not be empty")
 	}
 	if config.Name == "" {
-		return nil, maskAnyf(invalidConfigError, "name must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "name must not be empty")
 	}
 	if config.ProjectVersion == "" {
-		return nil, maskAnyf(invalidConfigError, "project version must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "project version must not be empty")
 	}
 	if config.Source == "" {
-		return nil, maskAnyf(invalidConfigError, "name must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "name must not be empty")
 	}
 
 	newCommand := &command{
