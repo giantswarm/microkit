@@ -5,6 +5,8 @@ import (
 	"time"
 
 	kitlog "github.com/go-kit/kit/log"
+
+	microerror "github.com/giantswarm/microkit/error"
 )
 
 // Config represents the configuration used to create a new logger.
@@ -28,7 +30,7 @@ func DefaultConfig() Config {
 func New(config Config) (Logger, error) {
 	// Settings.
 	if config.TimestampFormatter == nil {
-		return nil, maskAnyf(invalidConfigError, "timestamp formatter must not be empty")
+		return nil, microerror.MaskAnyf(invalidConfigError, "timestamp formatter must not be empty")
 	}
 
 	kitLogger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))

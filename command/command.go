@@ -5,6 +5,7 @@ import (
 
 	"github.com/giantswarm/microkit/command/daemon"
 	"github.com/giantswarm/microkit/command/version"
+	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
 	"github.com/giantswarm/microkit/server"
 )
@@ -53,7 +54,7 @@ func New(config Config) (Command, error) {
 
 		daemonCommand, err = daemon.New(daemonConfig)
 		if err != nil {
-			return nil, maskAny(err)
+			return nil, microerror.MaskAny(err)
 		}
 	}
 
@@ -69,7 +70,7 @@ func New(config Config) (Command, error) {
 
 		versionCommand, err = version.New(versionConfig)
 		if err != nil {
-			return nil, maskAny(err)
+			return nil, microerror.MaskAny(err)
 		}
 	}
 

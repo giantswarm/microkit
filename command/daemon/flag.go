@@ -5,6 +5,8 @@ import (
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+
+	microerror "github.com/giantswarm/microkit/error"
 )
 
 // Flags is the global flag structure used to apply certain configuration to it.
@@ -37,7 +39,7 @@ func MergeFlags(fs *pflag.FlagSet) error {
 			// In case there is no config file given we simply go ahead to check the
 			// process environment.
 		} else {
-			return maskAny(err)
+			return microerror.MaskAny(err)
 		}
 	}
 
