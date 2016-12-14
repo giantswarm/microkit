@@ -207,6 +207,8 @@ func (s *server) NewRouter() *mux.Router {
 			// When it is executed we know all necessary information to instrument the
 			// complete request, including its response status code.
 			defer func(t time.Time) {
+				s.Logger.Log("code", endpointCode, "endpoint", endpointName, "method", endpointMethod, "path", r.URL.Path)
+
 				// At the time this code is executed the status code is properly set. So
 				// we can use it for our instrumentation.
 				endpointCode := strconv.Itoa(endpointCode)
