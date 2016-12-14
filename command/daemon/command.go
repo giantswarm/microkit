@@ -114,8 +114,8 @@ func (c *command) New() *cobra.Command {
 		Run:   c.Execute,
 	}
 
-	newCommand.PersistentFlags().StringVar(&Flags.Config.Dir, "config.dir", ".", "Directory of the config file.")
-	newCommand.PersistentFlags().StringVar(&Flags.Config.File, "config.file", "config", "Name of the config file. All viper supported extensions can be used.")
+	newCommand.PersistentFlags().StringSliceVar(&Flags.Config.Dirs, "config.dirs", []string{"."}, "List of config file directories.")
+	newCommand.PersistentFlags().StringSliceVar(&Flags.Config.Files, "config.files", []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
 
 	newCommand.PersistentFlags().StringVar(&Flags.Server.Listen.Address, "server.listen.address", "http://127.0.0.1:8080", "Address used to make the server listen to.")
 
