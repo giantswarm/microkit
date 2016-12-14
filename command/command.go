@@ -107,8 +107,8 @@ func (c *command) CobraCommand() *cobra.Command {
 }
 
 // DaemonCommand returns the daemon sub command.
-func (c *command) DaemonCommand() *cobra.Command {
-	return c.daemonCommand.CobraCommand()
+func (c *command) DaemonCommand() daemon.Command {
+	return c.daemonCommand
 }
 
 // Execute represents the cobra run method.
@@ -117,6 +117,6 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 }
 
 // VersionCommand returns the version sub command.
-func (c *command) VersionCommand() *cobra.Command {
-	return c.versionCommand.CobraCommand()
+func (c *command) VersionCommand() version.Command {
+	return c.versionCommand
 }
