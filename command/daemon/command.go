@@ -43,15 +43,38 @@ func New(config Config) (Command, error) {
 	config.Logger = kitlog.NewContext(config.Logger).With("package", "command/daemon")
 
 	newCommand := &command{
-		Config: config,
+		// Internals.
+		cobraCommand:  nil,
+		logger:        config.Logger,
+		serverFactory: config.ServerFactory,
 	}
+
+	newCommand.cobraCommand = &cobra.Command{
+		Use:   "daemon",
+		Short: "Execute the daemon of the microservice.",
+		Long:  "Execute the daemon of the microservice.",
+		Run:   newCommand.Execute,
+	}
+
+	newCommand.cobraCommand.PersistentFlags().StringSliceVar(&Flags.Config.Dirs, "config.dirs", []string{"."}, "List of config file directories.")
+	newCommand.cobraCommand.PersistentFlags().StringSliceVar(&Flags.Config.Files, "config.files", []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
+
+	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.Listen.Address, "server.listen.address", "http://127.0.0.1:8080", "Address used to make the server listen to.")
 
 	return newCommand, nil
 }
 
 // command represents the daemon command.
 type command struct {
-	Config
+	// Internals.
+	cobraCommand  *cobra.Command
+	logger        logger.Logger
+	serverFactory func() server.Server
+}
+
+// CobraCommand returns the actual cobra command for the daemon command.
+func (c *command) CobraCommand() *cobra.Command {
+	return c.cobraCommand
 }
 
 // Execute represents the cobra run method.
@@ -66,14 +89,14 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 
 	var newServer server.Server
 	{
-		customServer := c.ServerFactory()
+		customServer := c.serverFactory()
 
 		serverConfig := server.DefaultConfig()
 
 		serverConfig.Endpoints = customServer.Endpoints()
 		serverConfig.ErrorEncoder = customServer.ErrorEncoder()
 		serverConfig.ListenAddress = Flags.Server.Listen.Address
-		serverConfig.Logger = c.Logger
+		serverConfig.Logger = c.logger
 		serverConfig.RequestFuncs = customServer.RequestFuncs()
 
 		newServer, err = server.New(serverConfig)
@@ -103,21 +126,4 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 	<-listener
 
 	os.Exit(0)
-}
-
-// New creates a new cobra command for the daemon command.
-func (c *command) New() *cobra.Command {
-	newCommand := &cobra.Command{
-		Use:   "daemon",
-		Short: "Execute the daemon of the microservice.",
-		Long:  "Execute the daemon of the microservice.",
-		Run:   c.Execute,
-	}
-
-	newCommand.PersistentFlags().StringSliceVar(&Flags.Config.Dirs, "config.dirs", []string{"."}, "List of config file directories.")
-	newCommand.PersistentFlags().StringSliceVar(&Flags.Config.Files, "config.files", []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
-
-	newCommand.PersistentFlags().StringVar(&Flags.Server.Listen.Address, "server.listen.address", "http://127.0.0.1:8080", "Address used to make the server listen to.")
-
-	return newCommand
 }
