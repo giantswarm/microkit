@@ -5,6 +5,6 @@ import (
 )
 
 type Command interface {
+	CobraCommand() *cobra.Command
 	Execute(cmd *cobra.Command, args []string)
-	New() *cobra.Command
 }
