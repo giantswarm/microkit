@@ -75,27 +75,40 @@ func New(config Config) (Command, error) {
 	}
 
 	newCommand := &command{
-		// Dependencies.
-		DaemonCommand:  daemonCommand,
-		VersionCommand: versionCommand,
-
-		// Settings.
-		Name:        config.Name,
-		Description: config.Description,
+		// Internals.
+		cobraCommand:   nil,
+		daemonCommand:  daemonCommand,
+		versionCommand: versionCommand,
 	}
+
+	newCommand.cobraCommand = &cobra.Command{
+		Use:   config.Name,
+		Short: config.Description,
+		Long:  config.Description,
+		Run:   newCommand.Execute,
+	}
+	newCommand.cobraCommand.AddCommand(newCommand.daemonCommand.CobraCommand())
+	newCommand.cobraCommand.AddCommand(newCommand.versionCommand.CobraCommand())
 
 	return newCommand, nil
 }
 
 // command represents the root command.
 type command struct {
-	// Dependencies.
-	DaemonCommand  daemon.Command
-	VersionCommand version.Command
+	// Internals.
+	cobraCommand   *cobra.Command
+	daemonCommand  daemon.Command
+	versionCommand version.Command
+}
 
-	// Settings.
-	Name        string
-	Description string
+// CobraCommand returns the actual cobra command for the root command.
+func (c *command) CobraCommand() *cobra.Command {
+	return c.cobraCommand
+}
+
+// DaemonCommand returns the daemon sub command.
+func (c *command) DaemonCommand() *cobra.Command {
+	return c.daemonCommand.CobraCommand()
 }
 
 // Execute represents the cobra run method.
@@ -103,17 +116,7 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 	cmd.HelpFunc()(cmd, nil)
 }
 
-// New creates a new cobra command for the root command.
-func (c *command) New() *cobra.Command {
-	newCommand := &cobra.Command{
-		Use:   c.Name,
-		Short: c.Description,
-		Long:  c.Description,
-		Run:   c.Execute,
-	}
-
-	newCommand.AddCommand(c.DaemonCommand.New())
-	newCommand.AddCommand(c.VersionCommand.New())
-
-	return newCommand
+// VersionCommand returns the version sub command.
+func (c *command) VersionCommand() *cobra.Command {
+	return c.versionCommand.CobraCommand()
 }
