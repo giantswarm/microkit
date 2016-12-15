@@ -2,10 +2,12 @@
 package logger
 
 import (
+	"fmt"
 	"os"
 	"time"
 
 	kitlog "github.com/go-kit/kit/log"
+	"github.com/go-stack/stack"
 
 	microerror "github.com/giantswarm/microkit/error"
 )
@@ -20,9 +22,12 @@ type Config struct {
 // DefaultConfig provides a default configuration to create a new logger by best
 // effort.
 func DefaultConfig() Config {
+
 	return Config{
 		// Settings.
-		Caller: kitlog.Caller(4),
+		Caller: func() interface{} {
+			return fmt.Sprintf("%+v", stack.Caller(4))
+		},
 		TimestampFormatter: func() interface{} {
 			return time.Now().UTC().Format("06-01-02 15:04:05.000")
 		},
