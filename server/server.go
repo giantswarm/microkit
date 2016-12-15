@@ -107,8 +107,6 @@ type server struct {
 	shutdownOnce sync.Once
 }
 
-// Boot registers the configured endpoints and starts the server under the
-// configured address.
 func (s *server) Boot() {
 	s.bootOnce.Do(func() {
 		handler := s.NewRouter()

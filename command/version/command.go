@@ -1,3 +1,4 @@
+// Package version implements the version command for any microservice.
 package version
 
 import (
@@ -73,7 +74,6 @@ func New(config Config) (Command, error) {
 	return newCommand, nil
 }
 
-// command represents the version command.
 type command struct {
 	// Internals.
 	cobraCommand *cobra.Command
@@ -86,12 +86,10 @@ type command struct {
 	source         string
 }
 
-// CobraCommand returns the actual cobra command for the version command.
 func (c *command) CobraCommand() *cobra.Command {
 	return c.cobraCommand
 }
 
-// Execute represents the cobra run method.
 func (c *command) Execute(cmd *cobra.Command, args []string) {
 	fmt.Printf("Description:        %s\n", c.description)
 	fmt.Printf("Git Commit:         %s\n", c.gitCommit)

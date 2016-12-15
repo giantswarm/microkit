@@ -1,3 +1,4 @@
+// Package logger implements a logging interface used to log messages.
 package logger
 
 import (
@@ -46,7 +47,6 @@ func New(config Config) (Logger, error) {
 	return newLogger, nil
 }
 
-// Logger implements a logging interface used to log messages.
 type logger struct {
 	Logger kitlog.Logger
 }

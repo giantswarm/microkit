@@ -1,3 +1,4 @@
+// Package daemon implements the daemon command for any microservice.
 package daemon
 
 import (
@@ -64,7 +65,6 @@ func New(config Config) (Command, error) {
 	return newCommand, nil
 }
 
-// command represents the daemon command.
 type command struct {
 	// Internals.
 	cobraCommand  *cobra.Command
@@ -72,12 +72,10 @@ type command struct {
 	serverFactory func() server.Server
 }
 
-// CobraCommand returns the actual cobra command for the daemon command.
 func (c *command) CobraCommand() *cobra.Command {
 	return c.cobraCommand
 }
 
-// Execute represents the cobra run method.
 func (c *command) Execute(cmd *cobra.Command, args []string) {
 	// Merge the given command line flags with the given environment variables and
 	// the given config file, if any. The merged flags will be applied to the
