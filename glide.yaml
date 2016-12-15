@@ -22,3 +22,5 @@ import:
 - package: golang.org/x/net
   subpackages:
   - context
+- package: github.com/go-stack/stack
+  version: ~1.5.2

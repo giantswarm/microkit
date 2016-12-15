@@ -6,6 +6,7 @@ package pflag
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 	"testing"
 )
@@ -47,7 +48,7 @@ func (v *triStateValue) String() string {
 	if *v == triStateMaybe {
 		return strTriStateMaybe
 	}
-	return strconv.FormatBool(*v == triStateTrue)
+	return fmt.Sprintf("%v", bool(*v == triStateTrue))
 }
 
 // The type of the flag as required by the pflag.Value interface
