@@ -46,8 +46,8 @@ func New(config Config) (Logger, error) {
 
 	kitLogger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
 	kitLogger = kitlog.NewContext(kitLogger).With(
-		"time", config.TimestampFormatter,
 		"caller", config.Caller,
+		"time", config.TimestampFormatter,
 	)
 
 	newLogger := &logger{
