@@ -13,6 +13,7 @@ import (
 // Config represents the configuration used to create a new logger.
 type Config struct {
 	// Settings.
+	Caller             kitlog.Valuer
 	TimestampFormatter kitlog.Valuer
 }
 
@@ -21,6 +22,7 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Settings.
+		Caller: kitlog.Caller(4),
 		TimestampFormatter: func() interface{} {
 			return time.Now().UTC().Format("06-01-02 15:04:05.000")
 		},
@@ -30,14 +32,17 @@ func DefaultConfig() Config {
 // New creates a new configured logger.
 func New(config Config) (Logger, error) {
 	// Settings.
+	if config.Caller == nil {
+		return nil, microerror.MaskAnyf(invalidConfigError, "caller must not be empty")
+	}
 	if config.TimestampFormatter == nil {
 		return nil, microerror.MaskAnyf(invalidConfigError, "timestamp formatter must not be empty")
 	}
 
 	kitLogger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
 	kitLogger = kitlog.NewContext(kitLogger).With(
-		"ts", config.TimestampFormatter,
-		"caller", kitlog.DefaultCaller,
+		"time", config.TimestampFormatter,
+		"caller", config.Caller,
 	)
 
 	newLogger := &logger{
