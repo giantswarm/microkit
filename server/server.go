@@ -3,6 +3,8 @@
 package server
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -139,7 +141,16 @@ func (s *server) Endpoints() []Endpoint {
 }
 
 func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
-	return s.errorEncoder
+	return func(ctx context.Context, err error, w http.ResponseWriter) {
+		s.errorEncoder(ctx, err, w)
+
+		s.Logger.Log("error", fmt.Sprintf("%#v", err))
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
 }
 
 // NewRouter returns a HTTP handler for the server. Here we register all
@@ -207,6 +218,8 @@ func (s *server) NewRouter() *mux.Router {
 			// When it is executed we know all necessary information to instrument the
 			// complete request, including its response status code.
 			defer func(t time.Time) {
+				s.Logger.Log("code", endpointCode, "endpoint", endpointName, "method", endpointMethod, "path", r.URL.Path)
+
 				// At the time this code is executed the status code is properly set. So
 				// we can use it for our instrumentation.
 				endpointCode := strconv.Itoa(endpointCode)
