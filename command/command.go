@@ -1,3 +1,4 @@
+// Package command implements the root command for any microservice.
 package command
 
 import (
@@ -93,7 +94,6 @@ func New(config Config) (Command, error) {
 	return newCommand, nil
 }
 
-// command represents the root command.
 type command struct {
 	// Internals.
 	cobraCommand   *cobra.Command
@@ -101,22 +101,18 @@ type command struct {
 	versionCommand version.Command
 }
 
-// CobraCommand returns the actual cobra command for the root command.
 func (c *command) CobraCommand() *cobra.Command {
 	return c.cobraCommand
 }
 
-// DaemonCommand returns the daemon sub command.
 func (c *command) DaemonCommand() daemon.Command {
 	return c.daemonCommand
 }
 
-// Execute represents the cobra run method.
 func (c *command) Execute(cmd *cobra.Command, args []string) {
 	cmd.HelpFunc()(cmd, nil)
 }
 
-// VersionCommand returns the version sub command.
 func (c *command) VersionCommand() version.Command {
 	return c.versionCommand
 }
