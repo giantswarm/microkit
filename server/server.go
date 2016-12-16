@@ -13,7 +13,6 @@ import (
 	"time"
 
 	kitendpoint "github.com/go-kit/kit/endpoint"
-	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -78,14 +77,12 @@ func New(config Config) (Server, error) {
 	}
 
 	newServer := &server{
-		Config: config,
-
 		bootOnce:     sync.Once{},
 		endpoints:    config.Endpoints,
 		errorEncoder: config.ErrorEncoder,
 		httpServer:   nil,
 		listenURL:    listenURL,
-		logger:       kitlog.NewContext(config.Logger).With("package", "server"),
+		logger:       config.Logger,
 		requestFuncs: config.RequestFuncs,
 		shutdownOnce: sync.Once{},
 	}
@@ -95,8 +92,6 @@ func New(config Config) (Server, error) {
 
 // server manages the transport logic and endpoint registration.
 type server struct {
-	Config
-
 	bootOnce     sync.Once
 	endpoints    []Endpoint
 	errorEncoder kithttp.ErrorEncoder
