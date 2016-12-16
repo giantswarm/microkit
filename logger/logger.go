@@ -3,7 +3,8 @@ package logger
 
 import (
 	"fmt"
-	"os"
+	"io"
+	"io/ioutil"
 	"time"
 
 	kitlog "github.com/go-kit/kit/log"
@@ -16,6 +17,7 @@ import (
 type Config struct {
 	// Settings.
 	Caller             kitlog.Valuer
+	IOWriter           io.Writer
 	TimestampFormatter kitlog.Valuer
 }
 
@@ -28,6 +30,7 @@ func DefaultConfig() Config {
 		Caller: func() interface{} {
 			return fmt.Sprintf("%+v", stack.Caller(4))
 		},
+		IOWriter: ioutil.Discard,
 		TimestampFormatter: func() interface{} {
 			return time.Now().UTC().Format("06-01-02 15:04:05.000")
 		},
@@ -44,7 +47,7 @@ func New(config Config) (Logger, error) {
 		return nil, microerror.MaskAnyf(invalidConfigError, "timestamp formatter must not be empty")
 	}
 
-	kitLogger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(os.Stdout))
+	kitLogger := kitlog.NewJSONLogger(kitlog.NewSyncWriter(config.IOWriter))
 	kitLogger = kitlog.NewContext(kitLogger).With(
 		"caller", config.Caller,
 		"time", config.TimestampFormatter,
