@@ -60,7 +60,7 @@ func New(config Config) (Command, error) {
 	newCommand.cobraCommand.PersistentFlags().StringSliceVar(&Flags.Config.Dirs, "config.dirs", []string{"."}, "List of config file directories.")
 	newCommand.cobraCommand.PersistentFlags().StringSliceVar(&Flags.Config.Files, "config.files", []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
 
-	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.Listen.Address, "server.listen.address", "http://127.0.0.1:8080", "Address used to make the server listen to.")
+	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.Listen.Address, "server.listen.address", "http://127.0.0.1:8000", "Address used to make the server listen to.")
 
 	return newCommand, nil
 }
