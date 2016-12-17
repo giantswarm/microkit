@@ -6,7 +6,6 @@ import (
 	"os/signal"
 	"sync"
 
-	kitlog "github.com/go-kit/kit/log"
 	"github.com/spf13/cobra"
 
 	microerror "github.com/giantswarm/microkit/error"
@@ -40,8 +39,6 @@ func New(config Config) (Command, error) {
 	if config.ServerFactory == nil {
 		return nil, microerror.MaskAnyf(invalidConfigError, "server factory must not be empty")
 	}
-
-	config.Logger = kitlog.NewContext(config.Logger).With("package", "command/daemon")
 
 	newCommand := &command{
 		// Internals.

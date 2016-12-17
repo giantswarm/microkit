@@ -13,7 +13,6 @@ import (
 	"time"
 
 	kitendpoint "github.com/go-kit/kit/endpoint"
-	kitlog "github.com/go-kit/kit/log"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -78,14 +77,12 @@ func New(config Config) (Server, error) {
 	}
 
 	newServer := &server{
-		Config: config,
-
 		bootOnce:     sync.Once{},
 		endpoints:    config.Endpoints,
 		errorEncoder: config.ErrorEncoder,
 		httpServer:   nil,
 		listenURL:    listenURL,
-		logger:       kitlog.NewContext(config.Logger).With("package", "server"),
+		logger:       config.Logger,
 		requestFuncs: config.RequestFuncs,
 		shutdownOnce: sync.Once{},
 	}
@@ -95,8 +92,6 @@ func New(config Config) (Server, error) {
 
 // server manages the transport logic and endpoint registration.
 type server struct {
-	Config
-
 	bootOnce     sync.Once
 	endpoints    []Endpoint
 	errorEncoder kithttp.ErrorEncoder
@@ -142,7 +137,7 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 	return func(ctx context.Context, err error, w http.ResponseWriter) {
 		s.errorEncoder(ctx, err, w)
 
-		s.Logger.Log("error", fmt.Sprintf("%#v", err))
+		s.logger.Log("error", fmt.Sprintf("%#v", err))
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(map[string]interface{}{
@@ -216,7 +211,7 @@ func (s *server) NewRouter() *mux.Router {
 			// When it is executed we know all necessary information to instrument the
 			// complete request, including its response status code.
 			defer func(t time.Time) {
-				s.Logger.Log("code", endpointCode, "endpoint", endpointName, "method", endpointMethod, "path", r.URL.Path)
+				s.logger.Log("code", endpointCode, "endpoint", endpointName, "method", endpointMethod, "path", r.URL.Path)
 
 				// At the time this code is executed the status code is properly set. So
 				// we can use it for our instrumentation.
