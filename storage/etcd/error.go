@@ -13,6 +13,7 @@ func IsInvalidConfig(err error) bool {
 
 var keyNotFoundError = errgo.New("key not found")
 
+// IsKeyNotFound asserts keyNotFoundError.
 func IsKeyNotFound(err error) bool {
 	return errgo.Cause(err) == keyNotFoundError
 }
