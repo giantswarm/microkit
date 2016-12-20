@@ -24,3 +24,7 @@ import:
   - context
 - package: github.com/go-stack/stack
   version: ~1.5.2
+- package: github.com/coreos/etcd
+  version: ~3.1.0-rc.1
+  subpackages:
+  - client
