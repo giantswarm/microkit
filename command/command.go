@@ -18,11 +18,10 @@ type Config struct {
 	ServerFactory func() server.Server
 
 	// Settings.
-	Description    string
-	GitCommit      string
-	Name           string
-	ProjectVersion string
-	Source         string
+	Description string
+	GitCommit   string
+	Name        string
+	Source      string
 }
 
 // DefaultConfig provides a default configuration to create a new root command
@@ -34,11 +33,10 @@ func DefaultConfig() Config {
 		ServerFactory: nil,
 
 		// Settings.
-		Description:    "",
-		GitCommit:      "",
-		Name:           "",
-		ProjectVersion: "",
-		Source:         "",
+		Description: "",
+		GitCommit:   "",
+		Name:        "",
+		Source:      "",
 	}
 }
 
@@ -66,7 +64,6 @@ func New(config Config) (Command, error) {
 		versionConfig.Description = config.Description
 		versionConfig.GitCommit = config.GitCommit
 		versionConfig.Name = config.Name
-		versionConfig.ProjectVersion = config.ProjectVersion
 		versionConfig.Source = config.Source
 
 		versionCommand, err = version.New(versionConfig)
