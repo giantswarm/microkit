@@ -13,11 +13,10 @@ import (
 // Config represents the configuration used to create a new version command.
 type Config struct {
 	// Settings.
-	Description    string
-	GitCommit      string
-	Name           string
-	ProjectVersion string
-	Source         string
+	Description string
+	GitCommit   string
+	Name        string
+	Source      string
 }
 
 // DefaultConfig provides a default configuration to create a new version
@@ -25,11 +24,10 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Settings.
-		Description:    "",
-		GitCommit:      "",
-		Name:           "",
-		ProjectVersion: "",
-		Source:         "",
+		Description: "",
+		GitCommit:   "",
+		Name:        "",
+		Source:      "",
 	}
 }
 
@@ -45,9 +43,6 @@ func New(config Config) (Command, error) {
 	if config.Name == "" {
 		return nil, microerror.MaskAnyf(invalidConfigError, "name must not be empty")
 	}
-	if config.ProjectVersion == "" {
-		return nil, microerror.MaskAnyf(invalidConfigError, "project version must not be empty")
-	}
 	if config.Source == "" {
 		return nil, microerror.MaskAnyf(invalidConfigError, "name must not be empty")
 	}
@@ -57,11 +52,10 @@ func New(config Config) (Command, error) {
 		cobraCommand: nil,
 
 		// Settings.
-		description:    config.Description,
-		gitCommit:      config.GitCommit,
-		name:           config.Name,
-		projectVersion: config.ProjectVersion,
-		source:         config.Source,
+		description: config.Description,
+		gitCommit:   config.GitCommit,
+		name:        config.Name,
+		source:      config.Source,
 	}
 
 	newCommand.cobraCommand = &cobra.Command{
@@ -79,11 +73,10 @@ type command struct {
 	cobraCommand *cobra.Command
 
 	// Settings.
-	description    string
-	gitCommit      string
-	name           string
-	projectVersion string
-	source         string
+	description string
+	gitCommit   string
+	name        string
+	source      string
 }
 
 func (c *command) CobraCommand() *cobra.Command {
@@ -91,11 +84,10 @@ func (c *command) CobraCommand() *cobra.Command {
 }
 
 func (c *command) Execute(cmd *cobra.Command, args []string) {
-	fmt.Printf("Description:        %s\n", c.description)
-	fmt.Printf("Git Commit:         %s\n", c.gitCommit)
-	fmt.Printf("Go Version:         %s\n", runtime.Version())
-	fmt.Printf("Name:               %s\n", c.name)
-	fmt.Printf("OS / Arch:          %s / %s\n", runtime.GOOS, runtime.GOARCH)
-	fmt.Printf("Project Version:    %s\n", c.projectVersion)
-	fmt.Printf("Source:             %s\n", c.source)
+	fmt.Printf("Description:    %s\n", c.description)
+	fmt.Printf("Git Commit:     %s\n", c.gitCommit)
+	fmt.Printf("Go Version:     %s\n", runtime.Version())
+	fmt.Printf("Name:           %s\n", c.name)
+	fmt.Printf("OS / Arch:      %s / %s\n", runtime.GOOS, runtime.GOARCH)
+	fmt.Printf("Source:         %s\n", c.source)
 }
