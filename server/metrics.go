@@ -31,4 +31,5 @@ var (
 func init() {
 	prometheus.MustRegister(endpointTotal)
 	prometheus.MustRegister(endpointTime)
+	prometheus.MustRegister(errorTotal)
 }
