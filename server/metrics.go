@@ -19,6 +19,13 @@ var (
 		},
 		[]string{"method", "endpoint", "code"},
 	)
+	errorTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "error_total",
+			Help: "Number of times we have seen a specific error",
+		},
+		[]string{"message"},
+	)
 )
 
 func init() {

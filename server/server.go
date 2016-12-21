@@ -135,10 +135,22 @@ func (s *server) Endpoints() []Endpoint {
 
 func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 	return func(ctx context.Context, err error, w http.ResponseWriter) {
+		// Run the custom error encoder. This is used to let the implementing
+		// microservice do something with errors occured during runtime. Things like
+		// writing specific HTTP status codes to the given response writer can be
+		// done.
 		s.errorEncoder(ctx, err, w)
 
+		// Log the error and its errgo trace. This is really useful for debugging.
 		s.logger.Log("error", fmt.Sprintf("%#v", err))
 
+		// Emit metrics about the occured errors. That way we can feed our
+		// instrumentation stack to have nice dashboards to get a picture about the
+		// general system health.
+		errorMessage := strings.Replace(err.Error(), " ", "_", -1)
+		errorTotal.WithLabelValues(errorMessage).Inc()
+
+		// Write the actual response body.
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"error": err.Error(),
