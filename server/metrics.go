@@ -24,7 +24,7 @@ var (
 			Name: "error_total",
 			Help: "Number of times we have seen a specific error",
 		},
-		[]string{"message"},
+		[]string{"type"},
 	)
 )
 

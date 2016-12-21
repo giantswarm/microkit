@@ -147,8 +147,23 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		// Emit metrics about the occured errors. That way we can feed our
 		// instrumentation stack to have nice dashboards to get a picture about the
 		// general system health.
-		errorMessage := strings.Replace(err.Error(), " ", "_", -1)
-		errorTotal.WithLabelValues(errorMessage).Inc()
+		var errorType string
+		switch e := err.(type) {
+		case kithttp.Error:
+			switch e.Domain {
+			case kithttp.DomainEncode:
+				errorType = "encode"
+			case kithttp.DomainDecode:
+				errorType = "decode"
+			case kithttp.DomainDo:
+				errorType = "domain"
+			default:
+				errorType = "server"
+			}
+		default:
+			errorType = "server"
+		}
+		errorTotal.WithLabelValues(errorType).Inc()
 
 		// Write the actual response body.
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
