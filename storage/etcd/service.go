@@ -12,6 +12,9 @@ import (
 type Config struct {
 	// Dependencies.
 	EtcdClient client.Client
+
+	// Settings.
+	Prefix string
 }
 
 // DefaultConfig provides a default configuration to create a new etcd service
@@ -29,6 +32,9 @@ func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
 		EtcdClient: etcdClient,
+
+		// Settings.
+		Prefix: "",
 	}
 }
 
@@ -44,7 +50,7 @@ func New(config Config) (*Service, error) {
 		etcdClient: config.EtcdClient,
 
 		// Internals.
-		keyClient: client.NewKeysAPI(config.EtcdClient),
+		keyClient: client.NewKeysAPIWithPrefix(config.EtcdClient, config.Prefix),
 	}
 
 	return newService, nil
