@@ -4,7 +4,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -135,13 +134,28 @@ func (s *server) Endpoints() []Endpoint {
 
 func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 	return func(ctx context.Context, err error, w http.ResponseWriter) {
+		errDomain := errorDomain(err)
+		errTrace := errorTrace(err)
+		errMessage := errorMessage(err)
+
+		// Run the custom error encoder. This is used to let the implementing
+		// microservice do something with errors occured during runtime. Things like
+		// writing specific HTTP status codes to the given response writer can be
+		// done.
 		s.errorEncoder(ctx, err, w)
 
-		s.logger.Log("error", fmt.Sprintf("%#v", err))
+		// Log the error and its errgo trace. This is really useful for debugging.
+		s.logger.Log("error", map[string]string{"domain": errDomain, "trace": errTrace, "message": errMessage})
 
+		// Emit metrics about the occured errors. That way we can feed our
+		// instrumentation stack to have nice dashboards to get a picture about the
+		// general system health.
+		errorTotal.WithLabelValues(errDomain).Inc()
+
+		// Write the actual response body.
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error": err.Error(),
+			"error": errMessage,
 		})
 	}
 }
@@ -154,8 +168,6 @@ func (s *server) NewRouter() *mux.Router {
 	// We go through all endpoints this server defines and register them to the
 	// router.
 	for _, e := range s.Endpoints() {
-		ctx := context.Background()
-
 		decoder := e.Decoder()
 		encoder := e.Encoder()
 		endpoint := e.Endpoint()
@@ -188,6 +200,8 @@ func (s *server) NewRouter() *mux.Router {
 		// prometheus. We track counts of execution and duration it took to complete
 		// the http.Handler.
 		router.Methods(method).Path(path).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := context.Background()
+
 			// Here we create a new wrapper for the http.ResponseWriter of the current
 			// request. We inject it into the called http.Handler so it can track the
 			// status code we are interested in. It will help us gathering the
@@ -216,8 +230,8 @@ func (s *server) NewRouter() *mux.Router {
 				// At the time this code is executed the status code is properly set. So
 				// we can use it for our instrumentation.
 				endpointCode := strconv.Itoa(endpointCode)
-				endpointTotal.WithLabelValues(endpointMethod, endpointName, endpointCode).Inc()
-				endpointTime.WithLabelValues(endpointMethod, endpointName, endpointCode).Set(float64(time.Since(t) / time.Millisecond))
+				endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
+				endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
 			}(time.Now())
 
 			// Now we execute the actual endpoint handler.
