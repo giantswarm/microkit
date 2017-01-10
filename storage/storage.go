@@ -31,7 +31,7 @@ func DefaultConfig() Config {
 	return Config{
 		// Settings.
 		EtcdAddress: "",
-		Kind:        "",
+		Kind:        KindMemory,
 	}
 }
 
