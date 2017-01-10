@@ -2,6 +2,7 @@
 package memory
 
 import (
+	"strings"
 	"sync"
 
 	microerror "github.com/giantswarm/microkit/error"
@@ -61,6 +62,38 @@ func (s *Service) Exists(key string) (bool, error) {
 	return ok, nil
 }
 
+func (s *Service) List(key string) ([]string, error) {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	var list []string
+
+	i := len(key)
+	for k, _ := range s.storage {
+		if len(k) <= i+1 {
+			continue
+		}
+		if !strings.HasPrefix(k, key) {
+			continue
+		}
+
+		if k[i] != '/' {
+			// We want to ignore all keys that are not separated by slash. When there
+			// is a key stored like "foo/bar/baz", listing keys using "foo/ba" should
+			// not succeed.
+			continue
+		}
+
+		list = append(list, k[i+1:])
+	}
+
+	if len(list) == 0 {
+		return nil, microerror.MaskAnyf(notFoundError, key)
+	}
+
+	return list, nil
+}
+
 func (s *Service) Search(key string) (string, error) {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -70,5 +103,5 @@ func (s *Service) Search(key string) (string, error) {
 		return value, nil
 	}
 
-	return "", microerror.MaskAnyf(keyNotFoundError, key)
+	return "", microerror.MaskAnyf(notFoundError, key)
 }
