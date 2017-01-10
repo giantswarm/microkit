@@ -4,8 +4,8 @@ import (
 	"github.com/juju/errgo"
 )
 
-var keyNotFoundError = errgo.New("key not found")
+var notFoundError = errgo.New("not found")
 
-func IsKeyNotFound(err error) bool {
-	return errgo.Cause(err) == keyNotFoundError
+func IsNotFound(err error) bool {
+	return errgo.Cause(err) == notFoundError
 }

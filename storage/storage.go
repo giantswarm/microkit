@@ -3,8 +3,9 @@
 package storage
 
 import (
-	"github.com/coreos/etcd/client"
+	"time"
 
+	"github.com/coreos/etcd/clientv3"
 	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/storage/etcd"
 	"github.com/giantswarm/microkit/storage/memory"
@@ -60,11 +61,11 @@ func New(config Config) (Service, error) {
 				return nil, microerror.MaskAnyf(invalidConfigError, "etcd address must not be empty")
 			}
 
-			etcdConfig := client.Config{
-				Endpoints: []string{config.EtcdAddress},
-				Transport: client.DefaultTransport,
+			etcdConfig := clientv3.Config{
+				Endpoints:   []string{config.EtcdAddress},
+				DialTimeout: 5 * time.Second,
 			}
-			etcdClient, err := client.New(etcdConfig)
+			etcdClient, err := clientv3.New(etcdConfig)
 			if err != nil {
 				return nil, microerror.MaskAny(err)
 			}

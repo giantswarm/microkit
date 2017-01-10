@@ -4,6 +4,57 @@ import (
 	"testing"
 )
 
+func Test_List(t *testing.T) {
+	config := DefaultConfig()
+	newStorage, err := New(config)
+	if err != nil {
+		panic(err)
+	}
+
+	val := "my-val"
+
+	err = newStorage.Create("key/one", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	err = newStorage.Create("key/two", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	values, err := newStorage.List("key")
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	if len(values) != 2 {
+		t.Fatal("expected", 2, "got", len(values))
+	}
+}
+
+func Test_List_Invalid(t *testing.T) {
+	config := DefaultConfig()
+	newStorage, err := New(config)
+	if err != nil {
+		panic(err)
+	}
+
+	val := "my-val"
+
+	err = newStorage.Create("key/one", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	err = newStorage.Create("key/two", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	_, err = newStorage.List("ke")
+	if !IsNotFound(err) {
+		t.Fatal("expected", true, "got", false)
+	}
+}
+
 func Test_Service(t *testing.T) {
 	newStorage, err := New(DefaultConfig())
 	if err != nil {
@@ -56,7 +107,7 @@ func Test_Service(t *testing.T) {
 	}
 
 	v, err = newStorage.Search(key)
-	if !IsKeyNotFound(err) {
+	if !IsNotFound(err) {
 		t.Fatal("expected", true, "got", false)
 	}
 	if v != "" {

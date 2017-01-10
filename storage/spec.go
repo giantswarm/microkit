@@ -15,6 +15,9 @@ type Service interface {
 	Delete(key string) error
 	// Exists checks if a value under the given key exists or not.
 	Exists(key string) (bool, error)
+	// List does a lookup for all values stored under key and returns them, if
+	// any.
+	List(key string) ([]string, error)
 	// Search does a lookup for the value stored under key and returns it, if any.
 	Search(key string) (string, error)
 }
