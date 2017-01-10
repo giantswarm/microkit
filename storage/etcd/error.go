@@ -4,6 +4,13 @@ import (
 	"github.com/juju/errgo"
 )
 
+var createFailedError = errgo.New("create failed")
+
+// IsCreateFailed asserts createFailedError.
+func IsCreateFailed(err error) bool {
+	return errgo.Cause(err) == createFailedError
+}
+
 var invalidConfigError = errgo.New("invalid config")
 
 // IsInvalidConfig asserts invalidConfigError.
@@ -11,9 +18,16 @@ func IsInvalidConfig(err error) bool {
 	return errgo.Cause(err) == invalidConfigError
 }
 
-var keyNotFoundError = errgo.New("key not found")
+var multipleValuesError = errgo.New("multiple values")
 
-// IsKeyNotFound asserts keyNotFoundError.
-func IsKeyNotFound(err error) bool {
-	return errgo.Cause(err) == keyNotFoundError
+// IsMultipleValuesFound asserts multipleValuesError.
+func IsMultipleValuesFound(err error) bool {
+	return errgo.Cause(err) == multipleValuesError
+}
+
+var notFoundError = errgo.New("not found")
+
+// IsNotFound asserts notFoundError.
+func IsNotFound(err error) bool {
+	return errgo.Cause(err) == notFoundError
 }

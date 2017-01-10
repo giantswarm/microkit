@@ -2,7 +2,9 @@
 package etcd
 
 import (
-	"github.com/coreos/etcd/client"
+	"time"
+
+	"github.com/coreos/etcd/clientv3"
 	"golang.org/x/net/context"
 
 	microerror "github.com/giantswarm/microkit/error"
@@ -11,7 +13,7 @@ import (
 // Config represents the configuration used to create a etcd service.
 type Config struct {
 	// Dependencies.
-	EtcdClient client.Client
+	EtcdClient *clientv3.Client
 
 	// Settings.
 	Prefix string
@@ -20,11 +22,11 @@ type Config struct {
 // DefaultConfig provides a default configuration to create a new etcd service
 // by best effort.
 func DefaultConfig() Config {
-	etcdConfig := client.Config{
-		Endpoints: []string{"http://127.0.0.1:2379"},
-		Transport: client.DefaultTransport,
+	etcdConfig := clientv3.Config{
+		Endpoints:   []string{"http://127.0.0.1:2379"},
+		DialTimeout: 5 * time.Second,
 	}
-	etcdClient, err := client.New(etcdConfig)
+	etcdClient, err := clientv3.New(etcdConfig)
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +52,8 @@ func New(config Config) (*Service, error) {
 		etcdClient: config.EtcdClient,
 
 		// Internals.
-		keyClient: client.NewKeysAPIWithPrefix(config.EtcdClient, config.Prefix),
+		keyClient: clientv3.NewKV(config.EtcdClient),
+		prefix:    config.Prefix,
 	}
 
 	return newService, nil
@@ -59,14 +62,17 @@ func New(config Config) (*Service, error) {
 // Service is the etcd service.
 type Service struct {
 	// Dependencies.
-	etcdClient client.Client
+	etcdClient *clientv3.Client
 
 	// Internals.
-	keyClient client.KeysAPI
+	keyClient clientv3.KV
+	prefix    string
 }
 
 func (s *Service) Create(key, value string) error {
-	_, err := s.keyClient.Create(context.TODO(), key, value)
+	key = s.key(key)
+
+	_, err := s.keyClient.Put(context.TODO(), key, value)
 	if err != nil {
 		return microerror.MaskAny(err)
 	}
@@ -75,10 +81,9 @@ func (s *Service) Create(key, value string) error {
 }
 
 func (s *Service) Delete(key string) error {
-	options := &client.DeleteOptions{
-		Recursive: true,
-	}
-	_, err := s.keyClient.Delete(context.TODO(), key, options)
+	key = s.key(key)
+
+	_, err := s.keyClient.Delete(context.TODO(), key)
 	if err != nil {
 		return microerror.MaskAny(err)
 	}
@@ -87,11 +92,8 @@ func (s *Service) Delete(key string) error {
 }
 
 func (s *Service) Exists(key string) (bool, error) {
-	options := &client.GetOptions{
-		Quorum: true,
-	}
-	_, err := s.keyClient.Get(context.TODO(), key, options)
-	if client.IsKeyNotFound(err) {
+	_, err := s.Search(key)
+	if IsNotFound(err) {
 		return false, nil
 	} else if err != nil {
 		return false, microerror.MaskAny(err)
@@ -100,16 +102,66 @@ func (s *Service) Exists(key string) (bool, error) {
 	return true, nil
 }
 
-func (s *Service) Search(key string) (string, error) {
-	options := &client.GetOptions{
-		Quorum: true,
+func (s *Service) List(key string) ([]string, error) {
+	opts := []clientv3.OpOption{
+		clientv3.WithKeysOnly(),
+		clientv3.WithPrefix(),
 	}
-	clientResponse, err := s.keyClient.Get(context.TODO(), key, options)
-	if client.IsKeyNotFound(err) {
-		return "", microerror.MaskAnyf(keyNotFoundError, key)
-	} else if err != nil {
+
+	key = s.key(key)
+	res, err := s.keyClient.Get(context.TODO(), key, opts...)
+	if err != nil {
+		return nil, microerror.MaskAny(err)
+	}
+
+	if res.Count == 0 {
+		return nil, microerror.MaskAnyf(notFoundError, key)
+	}
+
+	var list []string
+
+	i := len(key)
+	for _, kv := range res.Kvs {
+		k := string(kv.Key)
+
+		if len(k) <= i+1 {
+			continue
+		}
+
+		if k[i] != '/' {
+			// We want to ignore all keys that are not separated by slash. When there
+			// is a key stored like "foo/bar/baz", listing keys using "foo/ba" should
+			// not succeed.
+			continue
+		}
+
+		list = append(list, k[i+1:])
+	}
+
+	if len(list) == 0 {
+		return nil, microerror.MaskAnyf(notFoundError, key)
+	}
+
+	return list, nil
+}
+
+func (s *Service) Search(key string) (string, error) {
+	res, err := s.keyClient.Get(context.TODO(), s.key(key))
+	if err != nil {
 		return "", microerror.MaskAny(err)
 	}
 
-	return clientResponse.Node.Value, nil
+	if res.Count == 0 {
+		return "", microerror.MaskAnyf(notFoundError, key)
+	}
+
+	if res.Count > 1 {
+		return "", microerror.MaskAnyf(multipleValuesError, key)
+	}
+
+	return string(res.Kvs[0].Value), nil
+}
+
+func (s *Service) key(key string) string {
+	return s.prefix + "/" + key
 }
