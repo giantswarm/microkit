@@ -2,8 +2,6 @@
 package etcd
 
 import (
-	"time"
-
 	"github.com/coreos/etcd/clientv3"
 	"golang.org/x/net/context"
 
@@ -23,8 +21,7 @@ type Config struct {
 // by best effort.
 func DefaultConfig() Config {
 	etcdConfig := clientv3.Config{
-		Endpoints:   []string{"http://127.0.0.1:2379"},
-		DialTimeout: 5 * time.Second,
+		Endpoints: []string{"http://127.0.0.1:2379"},
 	}
 	etcdClient, err := clientv3.New(etcdConfig)
 	if err != nil {
