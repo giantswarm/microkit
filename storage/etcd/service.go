@@ -50,7 +50,9 @@ func New(config Config) (*Service, error) {
 
 		// Internals.
 		keyClient: clientv3.NewKV(config.EtcdClient),
-		prefix:    config.Prefix,
+
+		// Settings.
+		prefix: config.Prefix,
 	}
 
 	return newService, nil
@@ -63,7 +65,9 @@ type Service struct {
 
 	// Internals.
 	keyClient clientv3.KV
-	prefix    string
+
+	// Settings.
+	prefix string
 }
 
 func (s *Service) Create(key, value string) error {
