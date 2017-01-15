@@ -1,0 +1,127 @@
+// +build integration
+
+package etcdv2
+
+import (
+	"testing"
+)
+
+func Test_CreateExistsSearch(t *testing.T) {
+	config := DefaultConfig()
+	config.Prefix = "foo"
+	newStorage, err := New(config)
+	if err != nil {
+		panic(err)
+	}
+
+	key := "my-key"
+	val := "my-val"
+
+	// There should be no key/value pair being stored initially.
+	ok, err := newStorage.Exists(key)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	if ok {
+		t.Fatal("expected", false, "got", true)
+	}
+
+	// Creating the key/value pair should work.
+	err = newStorage.Create(key, val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	// There should be the created key/value pair.
+	ok, err = newStorage.Exists(key)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	if !ok {
+		t.Fatal("expected", true, "got", false)
+	}
+}
+
+func Test_List(t *testing.T) {
+	config := DefaultConfig()
+	config.Prefix = "foo"
+	newStorage, err := New(config)
+	if err != nil {
+		panic(err)
+	}
+
+	val := "my-val"
+
+	err = newStorage.Create("key/one", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	err = newStorage.Create("key/two", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	values, err := newStorage.List("key")
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	if len(values) != 2 {
+		t.Fatal("expected", 2, "got", len(values))
+	}
+	if values[0] != "one" {
+		t.Fatal("expected", "one", "got", values[0])
+	}
+	if values[1] != "two" {
+		t.Fatal("expected", "two", "got", values[1])
+	}
+}
+
+func Test_List_Nesting(t *testing.T) {
+	config := DefaultConfig()
+	config.Prefix = "foo"
+	newStorage, err := New(config)
+	if err != nil {
+		panic(err)
+	}
+
+	val := "my-val"
+
+	err = newStorage.Create("tokend/token/some/scope/id1", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	err = newStorage.Create("tokend/token/some/other/scope/id34", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	_, err = newStorage.List("tokend/token")
+	if !IsNotFound(err) {
+		t.Fatal("expected", true, "got", false)
+	}
+}
+
+func Test_List_Invalid_Key(t *testing.T) {
+	config := DefaultConfig()
+	config.Prefix = "foo"
+	newStorage, err := New(config)
+	if err != nil {
+		panic(err)
+	}
+
+	val := "my-val"
+
+	err = newStorage.Create("key/one", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+	err = newStorage.Create("key/two", val)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	_, err = newStorage.List("ke")
+	if !IsNotFound(err) {
+		t.Fatal("expected", true, "got", false)
+	}
+}
