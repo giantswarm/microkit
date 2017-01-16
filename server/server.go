@@ -72,6 +72,9 @@ func New(config Config) (Server, error) {
 	if config.ListenAddress == "" {
 		return nil, microerror.MaskAnyf(invalidConfigError, "listen address must not be empty")
 	}
+	if config.ServiceName == "" {
+		return nil, microerror.MaskAnyf(invalidConfigError, "service name must not be empty")
+	}
 
 	listenURL, err := url.Parse(config.ListenAddress)
 	if err != nil {
@@ -160,7 +163,7 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"error": errMessage,
-			"from":  s.serviceName,
+			"from":  s.ServiceName(),
 		})
 	}
 }
@@ -196,7 +199,7 @@ func (s *server) NewRouter() *mux.Router {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"error": errMessage,
-			"from":  s.serviceName,
+			"from":  s.ServiceName(),
 		})
 	}))
 
@@ -288,6 +291,10 @@ func (s *server) NewRouter() *mux.Router {
 
 func (s *server) RequestFuncs() []kithttp.RequestFunc {
 	return s.requestFuncs
+}
+
+func (s *server) ServiceName() string {
+	return s.serviceName
 }
 
 func (s *server) Shutdown() {
