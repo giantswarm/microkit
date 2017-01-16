@@ -2,6 +2,8 @@
 package etcd
 
 import (
+	"path/filepath"
+
 	"github.com/coreos/etcd/clientv3"
 	"golang.org/x/net/context"
 
@@ -164,5 +166,5 @@ func (s *Service) Search(key string) (string, error) {
 }
 
 func (s *Service) key(key string) string {
-	return s.prefix + "/" + key
+	return filepath.Clean(filepath.Join("/", s.prefix, key))
 }
