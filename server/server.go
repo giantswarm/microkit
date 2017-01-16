@@ -165,6 +165,10 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 func (s *server) NewRouter() *mux.Router {
 	router := mux.NewRouter()
 
+	router.NotFoundHandler = http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s.logger.Log("code", http.StatusNotFound, "endpoint", "notfound", "method", r.Method, "path", r.URL.Path)
+	}))
+
 	// We go through all endpoints this server defines and register them to the
 	// router.
 	for _, e := range s.Endpoints() {
