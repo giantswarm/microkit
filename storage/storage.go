@@ -26,6 +26,7 @@ const (
 type Config struct {
 	// Settings.
 	EtcdAddress string
+	EtcdPrefix  string
 	Kind        string
 }
 
@@ -35,6 +36,7 @@ func DefaultConfig() Config {
 	return Config{
 		// Settings.
 		EtcdAddress: "",
+		EtcdPrefix:  "",
 		Kind:        KindMemory,
 	}
 }
@@ -76,6 +78,7 @@ func New(config Config) (Service, error) {
 
 			storageConfig := etcd.DefaultConfig()
 			storageConfig.EtcdClient = etcdClient
+			storageConfig.Prefix = config.EtcdPrefix
 			storageService, err = etcd.New(storageConfig)
 			if err != nil {
 				return nil, microerror.MaskAny(err)
@@ -96,6 +99,7 @@ func New(config Config) (Service, error) {
 
 			storageConfig := etcdv2.DefaultConfig()
 			storageConfig.EtcdClient = etcdClient
+			storageConfig.Prefix = config.EtcdPrefix
 			storageService, err = etcdv2.New(storageConfig)
 			if err != nil {
 				return nil, microerror.MaskAny(err)
