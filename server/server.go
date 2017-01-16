@@ -4,6 +4,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -32,6 +33,7 @@ type Config struct {
 
 	// Settings.
 	ListenAddress string
+	ServiceName   string
 }
 
 // DefaultConfig provides a default configuration to create a new server object
@@ -46,6 +48,7 @@ func DefaultConfig() Config {
 
 		// Settings.
 		ListenAddress: "http://127.0.0.1:8080",
+		ServiceName:   "microkit",
 	}
 }
 
@@ -83,6 +86,7 @@ func New(config Config) (Server, error) {
 		listenURL:    listenURL,
 		logger:       config.Logger,
 		requestFuncs: config.RequestFuncs,
+		serviceName:  config.ServiceName,
 		shutdownOnce: sync.Once{},
 	}
 
@@ -98,6 +102,7 @@ type server struct {
 	listenURL    *url.URL
 	logger       logger.Logger
 	requestFuncs []kithttp.RequestFunc
+	serviceName  string
 	shutdownOnce sync.Once
 }
 
@@ -134,10 +139,6 @@ func (s *server) Endpoints() []Endpoint {
 
 func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 	return func(ctx context.Context, err error, w http.ResponseWriter) {
-		errDomain := errorDomain(err)
-		errTrace := errorTrace(err)
-		errMessage := errorMessage(err)
-
 		// Run the custom error encoder. This is used to let the implementing
 		// microservice do something with errors occured during runtime. Things like
 		// writing specific HTTP status codes to the given response writer can be
@@ -145,7 +146,10 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		s.errorEncoder(ctx, err, w)
 
 		// Log the error and its errgo trace. This is really useful for debugging.
-		s.logger.Log("error", map[string]string{"domain": errDomain, "trace": errTrace, "message": errMessage})
+		errDomain := errorDomain(err)
+		errMessage := errorMessage(err)
+		errTrace := errorTrace(err)
+		s.logger.Log("error", map[string]string{"domain": errDomain, "message": errMessage, "trace": errTrace})
 
 		// Emit metrics about the occured errors. That way we can feed our
 		// instrumentation stack to have nice dashboards to get a picture about the
@@ -156,6 +160,7 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"error": errMessage,
+			"from":  s.serviceName,
 		})
 	}
 }
@@ -165,8 +170,34 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 func (s *server) NewRouter() *mux.Router {
 	router := mux.NewRouter()
 
+	// Define our custom not found handler. Here we take care about logging,
+	// metrics and a proper response.
 	router.NotFoundHandler = http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.logger.Log("code", http.StatusNotFound, "endpoint", "notfound", "method", r.Method, "path", r.URL.Path)
+		// Log the error and its message. This is really useful for debugging.
+		errDomain := errorDomain(nil)
+		errMessage := fmt.Sprintf("not found: %s %s", r.Method, r.URL.Path)
+		errTrace := ""
+		s.logger.Log("error", map[string]string{"domain": errDomain, "message": errMessage, "trace": errTrace})
+
+		// This defered callback will be executed at the very end of the request.
+		defer func(t time.Time) {
+			endpointCode := strconv.Itoa(http.StatusNotFound)
+			endpointMethod := strings.ToLower(r.Method)
+			endpointName := "notfound"
+
+			endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
+			endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
+
+			errorTotal.WithLabelValues(errDomain).Inc()
+		}(time.Now())
+
+		// Write the actual response body.
+		w.WriteHeader(http.StatusNotFound)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"error": errMessage,
+			"from":  s.serviceName,
+		})
 	}))
 
 	// We go through all endpoints this server defines and register them to the
@@ -229,7 +260,7 @@ func (s *server) NewRouter() *mux.Router {
 			// When it is executed we know all necessary information to instrument the
 			// complete request, including its response status code.
 			defer func(t time.Time) {
-				s.logger.Log("code", endpointCode, "endpoint", endpointName, "method", endpointMethod, "path", r.URL.Path)
+				s.logger.Log("code", endpointCode, "endpoint", name, "method", endpointMethod, "path", r.URL.Path)
 
 				// At the time this code is executed the status code is properly set. So
 				// we can use it for our instrumentation.
