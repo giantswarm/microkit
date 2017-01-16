@@ -12,6 +12,11 @@ Run the integration tests.
 GOOS=darwin; GOARCH=amd64 go test -tags integration ./storage/etcdv2
 ```
 
+Check the keyspace within etcd.
+```
+docker run --rm --net host --name etcdctl quay.io/coreos/etcd:v3.0.16 etcdctl ls --recursive
+```
+
 Cleanup the keyspace within etcd.
 ```
 docker run --rm --net host --name etcdctl quay.io/coreos/etcd:v3.0.16 etcdctl rm --recursive /foo
