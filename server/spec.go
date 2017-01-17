@@ -51,6 +51,9 @@ type Server interface {
 	// RequestFuncs returns the server's configured list of request functions.
 	// These are the custom request functions configured by the client.
 	RequestFuncs() []kithttp.RequestFunc
+	// ServiceName returns the name of the micro-service implementing the microkit
+	// server. This is used for logging and instrumentation.
+	ServiceName() string
 	// Shutdown stops the running server gracefully.
 	Shutdown()
 }
