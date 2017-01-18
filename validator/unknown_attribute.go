@@ -1,4 +1,3 @@
-// Validator provides validation primitives for microservices.
 package validator
 
 import (
@@ -6,7 +5,39 @@ import (
 	"fmt"
 
 	microerror "github.com/giantswarm/microkit/error"
+	"github.com/juju/errgo"
 )
+
+// UnknownAttributeError indicates there was an error due to unknown attributes
+// within validated data structures.
+type UnknownAttributeError struct {
+	attribute string
+	message   string
+}
+
+// Attribute returns the detected unknown attribute.
+func (e UnknownAttributeError) Attribute() string {
+	return e.attribute
+}
+
+// Error returns the actual error message of the UnknownAttributeError to
+// implement the error interface.
+func (e UnknownAttributeError) Error() string {
+	return e.message
+}
+
+// IsUnknownAttribute asserts UnknownAttributeError.
+func IsUnknownAttribute(err error) bool {
+	_, ok := ToUnknownAttribute(err)
+	return ok
+}
+
+// ToUnknownAttribute tries to assert the given error to UnknownAttributeError
+// and returns the asserted error and true in case this was successful.
+func ToUnknownAttribute(err error) (UnknownAttributeError, bool) {
+	e, ok := errgo.Cause(err).(UnknownAttributeError)
+	return e, ok
+}
 
 // StructToMap is a helper method to convert an expected request data structure
 // in the correctly formatted type to UnknownAttributes.
@@ -25,13 +56,13 @@ func StructToMap(s interface{}) (map[string]interface{}, error) {
 	return m, nil
 }
 
-// UnknownAttributes takes an arbitrary map and a map obtaining some expected
+// UnknownAttribute takes an arbitrary map and a map obtaining some expected
 // structure. The first argument might represent an incoming request of some
 // microservice. The second argument should then represent the datastructure of
 // the associated request as it is expected to be provided. In case received
 // contains fields which are not available in expected, an UnknownAttributeError
 // is returned.
-func UnknownAttributes(received, expected map[string]interface{}) error {
+func UnknownAttribute(received, expected map[string]interface{}) error {
 	for r, _ := range received {
 		var found bool
 

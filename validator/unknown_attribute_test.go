@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func Test_UnknownFields(t *testing.T) {
+func Test_UnknownAttribute(t *testing.T) {
 	testCases := []struct {
 		Received       map[string]interface{}
 		Expected       map[string]interface{}
@@ -50,7 +50,7 @@ func Test_UnknownFields(t *testing.T) {
 	}
 
 	for i, testCase := range testCases {
-		err := UnknownAttributes(testCase.Received, testCase.Expected)
+		err := UnknownAttribute(testCase.Received, testCase.Expected)
 
 		if (err != nil && testCase.ErrorMatcher == nil) || (testCase.ErrorMatcher != nil && !testCase.ErrorMatcher(err)) {
 			t.Fatal("case", i+1, "expected", true, "got", false)
