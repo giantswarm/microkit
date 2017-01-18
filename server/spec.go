@@ -58,6 +58,27 @@ type Server interface {
 	Shutdown()
 }
 
+// ResponseError is a wrapper for errors passed to the client's error encoder to
+// propagate specific response information in error cases.
+type ResponseError interface {
+	// Code returns the code being tracked using SetCode.
+	Code() string
+	// Message returns the message being tracked using SetMessage.
+	Message() string
+	// IsEndpoint checks whether the underlying error originates from an endpoints
+	// business logic. This includes decoder and encoder errors. In case
+	// IsEndpoint returns false, something unexpected happened and the current
+	// error should probably be handled as internal server error.
+	IsEndpoint() bool
+	// SetCode tracks the given response code for the current response error. The
+	// given response code will be used for logging, instrumentation and response
+	// creation.
+	SetCode(code string)
+	// SetMessage tracks the given response message for the current response
+	// error. The given response message will be used for response creation.
+	SetMessage(message string)
+}
+
 // ResponseWriter is a wrapper for http.ResponseWriter to track the written
 // status code.
 type ResponseWriter interface {
