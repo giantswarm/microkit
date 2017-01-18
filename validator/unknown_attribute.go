@@ -49,7 +49,7 @@ func StructToMap(s interface{}) (map[string]interface{}, error) {
 	}
 
 	var m map[string]interface{}
-	err = json.Unmarshal(b, m)
+	err = json.Unmarshal(b, &m)
 	if err != nil {
 		return nil, microerror.MaskAny(err)
 	}
