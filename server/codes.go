@@ -16,4 +16,9 @@ var (
 	CodeResourceNotFound = "RESOURCE_NOT_FOUND"
 	// CodeResourceUpdated indicates a resource has been updated.
 	CodeResourceUpdated = "RESOURCE_UPDATED"
+	// CodeUnknownAttribute indicates the provided data structure contains
+	// unexpected fields.
+	CodeUnknownAttribute = "UNKNOWN_ATTRIBUTE"
+	// CodeUnknownError indicates something went wrong in unpredictable ways.
+	CodeUnknownError = "UNKNOWN_ERROR"
 )
