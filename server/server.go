@@ -142,6 +142,14 @@ func (s *server) Endpoints() []Endpoint {
 
 func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 	return func(ctx context.Context, err error, w http.ResponseWriter) {
+		// At first we have to set the content type of the actual error response. If
+		// we would set it at the end we would set a trailing header that would not
+		// be recognized by most of the clients out there. This is because in the
+		// next call to the errorEncoder below the client's implementation of the
+		// errorEncoder probably writes the status code header, which marks the
+		// beginning of trailing headers in HTTP.
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
 		// Run the custom error encoder. This is used to let the implementing
 		// microservice do something with errors occured during runtime. Things like
 		// writing specific HTTP status codes to the given response writer can be
@@ -160,7 +168,6 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		errorTotal.WithLabelValues(errDomain).Inc()
 
 		// Write the actual response body.
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"error": errMessage,
 			"from":  s.ServiceName(),

@@ -5,13 +5,6 @@ import (
 	"github.com/juju/errgo"
 )
 
-var invalidConfigError = errgo.New("invalid config")
-
-// IsInvalidConfig asserts invalidConfigError.
-func IsInvalidConfig(err error) bool {
-	return errgo.Cause(err) == invalidConfigError
-}
-
 func errorDomain(err error) string {
 	switch e := err.(type) {
 	case kithttp.Error:
@@ -27,6 +20,17 @@ func errorDomain(err error) string {
 	return "server"
 }
 
+func errorMessage(err error) string {
+	switch kitErr := err.(type) {
+	case kithttp.Error:
+		switch errgoErr := kitErr.Err.(type) {
+		case *errgo.Err:
+			return errgoErr.Error()
+		}
+	}
+	return err.Error()
+}
+
 func errorTrace(err error) string {
 	switch kitErr := err.(type) {
 	case kithttp.Error:
@@ -38,13 +42,9 @@ func errorTrace(err error) string {
 	return "n/a"
 }
 
-func errorMessage(err error) string {
-	switch kitErr := err.(type) {
-	case kithttp.Error:
-		switch errgoErr := kitErr.Err.(type) {
-		case *errgo.Err:
-			return errgoErr.Error()
-		}
-	}
-	return err.Error()
+var invalidConfigError = errgo.New("invalid config")
+
+// IsInvalidConfig asserts invalidConfigError.
+func IsInvalidConfig(err error) bool {
+	return errgo.Cause(err) == invalidConfigError
 }
