@@ -61,9 +61,14 @@ type Server interface {
 // ResponseError is a wrapper for errors passed to the client's error encoder to
 // propagate specific response information in error cases.
 type ResponseError interface {
-	// Code returns the code being tracked using SetCode.
+	// Code returns the code being tracked using SetCode. If this code is not set
+	// using SetCode it defaults to CodeUnknownError.
 	Code() string
-	// Message returns the message being tracked using SetMessage.
+	// Error returns the message of the underlying error.
+	Error() string
+	// Message returns the message being tracked using SetMessage. If this message
+	// is not set using SetMessage it defaults to the error message of the
+	// underlying error.
 	Message() string
 	// IsEndpoint checks whether the underlying error originates from an endpoints
 	// business logic. This includes decoder and encoder errors. In case

@@ -30,8 +30,8 @@ func NewResponseError(config ResponseErrorConfig) (ResponseError, error) {
 
 	newResponseError := &responseError{
 		// Internals.
-		code:    "",
-		message: "",
+		code:    CodeUnknownError,
+		message: errorMessage(config.Underlying),
 
 		// Settings.
 		underlying: config.Underlying,
@@ -53,20 +53,24 @@ func (e *responseError) Code() string {
 	return e.code
 }
 
+func (e *responseError) Error() string {
+	return e.underlying.Error()
+}
+
 func (e *responseError) Message() string {
 	return e.message
 }
 
 func (e *responseError) IsEndpoint() bool {
-	switch e := err.(type) {
+	switch u := e.underlying.(type) {
 	case kithttp.Error:
-		switch e.Domain {
+		switch u.Domain {
 		case kithttp.DomainEncode:
-			true
+			return true
 		case kithttp.DomainDecode:
-			true
+			return true
 		case kithttp.DomainDo:
-			true
+			return true
 		}
 	}
 

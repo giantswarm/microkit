@@ -150,11 +150,21 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		// beginning of trailing headers in HTTP.
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
+		// Create the microkit specific response error, which acts as error wrapper
+		// within the client's error encoder. It is used to propagate response codes
+		// and messages, so we can use them below.
+		responseConfig := DefaultResponseErrorConfig()
+		responseConfig.Underlying = err
+		responseError, err := NewResponseError(responseConfig)
+		if err != nil {
+			panic(err)
+		}
+
 		// Run the custom error encoder. This is used to let the implementing
 		// microservice do something with errors occured during runtime. Things like
 		// writing specific HTTP status codes to the given response writer can be
 		// done.
-		s.errorEncoder(ctx, err, w)
+		s.errorEncoder(ctx, responseError, w)
 
 		// Log the error and its errgo trace. This is really useful for debugging.
 		errDomain := errorDomain(err)
@@ -169,7 +179,8 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 
 		// Write the actual response body.
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"error": errMessage,
+			"code":  responseError.Code(),
+			"error": responseError.Message(),
 			"from":  s.ServiceName(),
 		})
 	}
