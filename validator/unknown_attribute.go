@@ -28,15 +28,16 @@ func (e UnknownAttributeError) Error() string {
 
 // IsUnknownAttribute asserts UnknownAttributeError.
 func IsUnknownAttribute(err error) bool {
-	_, ok := ToUnknownAttribute(err)
+	_, ok := errgo.Cause(err).(UnknownAttributeError)
 	return ok
 }
 
-// ToUnknownAttribute tries to assert the given error to UnknownAttributeError
-// and returns the asserted error and true in case this was successful.
-func ToUnknownAttribute(err error) (UnknownAttributeError, bool) {
-	e, ok := errgo.Cause(err).(UnknownAttributeError)
-	return e, ok
+// ToUnknownAttribute tries asserts the given error to UnknownAttributeError and
+// returns it. ToUnknownAttribute panics in case the underlying error is not of
+// type UnknownAttributeError. Therefore IsUnknownAttribute should always be
+// used to verify the safe execution of ToUnknownAttribute beforehand.
+func ToUnknownAttribute(err error) UnknownAttributeError {
+	return errgo.Cause(err).(UnknownAttributeError)
 }
 
 // StructToMap is a helper method to convert an expected request data structure

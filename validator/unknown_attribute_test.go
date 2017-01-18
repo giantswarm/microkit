@@ -57,12 +57,7 @@ func Test_UnknownAttribute(t *testing.T) {
 		}
 
 		if testCase.ErrorMatcher != nil {
-			e, ok := ToUnknownAttribute(err)
-			if !ok {
-				t.Fatal("case", i+1, "expected", true, "got", false)
-			}
-
-			errorAttribute := e.Attribute()
+			errorAttribute := ToUnknownAttribute(err).Attribute()
 			if errorAttribute != testCase.ErrorAttribute {
 				t.Fatal("case", i+1, "expected", testCase.ErrorAttribute, "got", errorAttribute)
 			}
