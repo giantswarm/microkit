@@ -5,6 +5,7 @@ import (
 
 	kitendpoint "github.com/go-kit/kit/endpoint"
 	kithttp "github.com/go-kit/kit/transport/http"
+	"github.com/gorilla/mux"
 )
 
 // Endpoint represents the management of transport logic. An endpoint defines
@@ -51,6 +52,9 @@ type Server interface {
 	// RequestFuncs returns the server's configured list of request functions.
 	// These are the custom request functions configured by the client.
 	RequestFuncs() []kithttp.RequestFunc
+	// Router returns a HTTP handler for the server. The returned router will have
+	// all endpoints registered that are listed in the endpoint collection.
+	Router() *mux.Router
 	// ServiceName returns the name of the micro-service implementing the microkit
 	// server. This is used for logging and instrumentation.
 	ServiceName() string
