@@ -21,6 +21,9 @@ func errorDomain(err error) string {
 }
 
 func errorMessage(err error) string {
+	if err == nil {
+		return ""
+	}
 	switch kitErr := err.(type) {
 	case kithttp.Error:
 		switch errgoErr := kitErr.Err.(type) {

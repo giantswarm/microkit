@@ -93,6 +93,7 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 		serverConfig.ListenAddress = Flags.Server.Listen.Address
 		serverConfig.Logger = c.logger
 		serverConfig.RequestFuncs = customServer.RequestFuncs()
+		serverConfig.Router = customServer.Router()
 		serverConfig.ServiceName = customServer.ServiceName()
 
 		newServer, err = server.New(serverConfig)
