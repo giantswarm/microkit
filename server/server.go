@@ -143,6 +143,7 @@ func (s *server) Boot() {
 			w.WriteHeader(http.StatusNotFound)
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			json.NewEncoder(w).Encode(map[string]interface{}{
+				"code":  CodeResourceNotFound,
 				"error": errMessage,
 				"from":  s.ServiceName(),
 			})
