@@ -271,11 +271,14 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		// Create the microkit specific response error, which acts as error wrapper
 		// within the client's error encoder. It is used to propagate response codes
 		// and messages, so we can use them below.
-		responseConfig := DefaultResponseErrorConfig()
-		responseConfig.Underlying = err
-		responseError, err := NewResponseError(responseConfig)
-		if err != nil {
-			panic(err)
+		var responseError ResponseError
+		{
+			responseConfig := DefaultResponseErrorConfig()
+			responseConfig.Underlying = err
+			responseError, err = NewResponseError(responseConfig)
+			if err != nil {
+				panic(err)
+			}
 		}
 
 		// Run the custom error encoder. This is used to let the implementing
