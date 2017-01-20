@@ -1,7 +1,7 @@
 package transaction
 
 import (
-	"context"
+	"golang.org/x/net/context"
 )
 
 // ExecuteConfig is used to configure the Executer.

@@ -3,7 +3,7 @@
 package transaction
 
 import (
-	"context"
+	"golang.org/x/net/context"
 
 	microerror "github.com/giantswarm/microkit/error"
 	micrologger "github.com/giantswarm/microkit/logger"
