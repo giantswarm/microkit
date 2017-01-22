@@ -106,7 +106,7 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 	// given transaction registered yet, we are executing the trial.
 	{
 		key := transactionKey("transaction", transactionID, "trial", config.TrialID)
-		exists, err := e.storage.Exists(key)
+		exists, err := e.storage.Exists(ctx, key)
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
@@ -133,7 +133,7 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		}
 
 		key := transactionKey("transaction", transactionID, "trial", config.TrialID)
-		err = e.storage.Create(key, "{}")
+		err = e.storage.Create(ctx, key, "{}")
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
