@@ -260,7 +260,9 @@ func (s *server) Endpoints() []Endpoint {
 }
 
 func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
-	return func(ctx context.Context, err error, w http.ResponseWriter) {
+	return func(ctx context.Context, serverError error, w http.ResponseWriter) {
+		var err error
+
 		// At first we have to set the content type of the actual error response. If
 		// we would set it at the end we would set a trailing header that would not
 		// be recognized by most of the clients out there. This is because in the
@@ -275,7 +277,7 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		var responseError ResponseError
 		{
 			responseConfig := DefaultResponseErrorConfig()
-			responseConfig.Underlying = err
+			responseConfig.Underlying = serverError
 			responseError, err = NewResponseError(responseConfig)
 			if err != nil {
 				panic(err)
@@ -289,9 +291,9 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 		s.errorEncoder(ctx, responseError, w)
 
 		// Log the error and its errgo trace. This is really useful for debugging.
-		errDomain := errorDomain(err)
-		errMessage := errorMessage(err)
-		errTrace := errorTrace(err)
+		errDomain := errorDomain(serverError)
+		errMessage := errorMessage(serverError)
+		errTrace := errorTrace(serverError)
 		s.logger.Log("error", map[string]string{"domain": errDomain, "message": errMessage, "trace": errTrace})
 
 		// Emit metrics about the occured errors. That way we can feed our
