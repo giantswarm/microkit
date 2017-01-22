@@ -2,6 +2,8 @@ package memory
 
 import (
 	"testing"
+
+	"golang.org/x/net/context"
 )
 
 func Test_List(t *testing.T) {
@@ -13,16 +15,16 @@ func Test_List(t *testing.T) {
 
 	val := "my-val"
 
-	err = newStorage.Create("key/one", val)
+	err = newStorage.Create(context.TODO(), "key/one", val)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
-	err = newStorage.Create("key/two", val)
+	err = newStorage.Create(context.TODO(), "key/two", val)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
 
-	values, err := newStorage.List("key")
+	values, err := newStorage.List(context.TODO(), "key")
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
@@ -40,16 +42,16 @@ func Test_List_Invalid(t *testing.T) {
 
 	val := "my-val"
 
-	err = newStorage.Create("key/one", val)
+	err = newStorage.Create(context.TODO(), "key/one", val)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
-	err = newStorage.Create("key/two", val)
+	err = newStorage.Create(context.TODO(), "key/two", val)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
 
-	_, err = newStorage.List("ke")
+	_, err = newStorage.List(context.TODO(), "ke")
 	if !IsNotFound(err) {
 		t.Fatal("expected", true, "got", false)
 	}
@@ -64,7 +66,7 @@ func Test_Service(t *testing.T) {
 	key := "test-key"
 	value := "test-value"
 
-	ok, err := newStorage.Exists(key)
+	ok, err := newStorage.Exists(context.TODO(), key)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
@@ -72,12 +74,12 @@ func Test_Service(t *testing.T) {
 		t.Fatal("expected", false, "got", true)
 	}
 
-	err = newStorage.Create(key, value)
+	err = newStorage.Create(context.TODO(), key, value)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
 
-	ok, err = newStorage.Exists(key)
+	ok, err = newStorage.Exists(context.TODO(), key)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
@@ -85,7 +87,7 @@ func Test_Service(t *testing.T) {
 		t.Fatal("expected", true, "got", false)
 	}
 
-	v, err := newStorage.Search(key)
+	v, err := newStorage.Search(context.TODO(), key)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
@@ -93,12 +95,12 @@ func Test_Service(t *testing.T) {
 		t.Fatal("expected", value, "got", v)
 	}
 
-	err = newStorage.Delete(key)
+	err = newStorage.Delete(context.TODO(), key)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
 
-	ok, err = newStorage.Exists(key)
+	ok, err = newStorage.Exists(context.TODO(), key)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
@@ -106,7 +108,7 @@ func Test_Service(t *testing.T) {
 		t.Fatal("expected", false, "got", true)
 	}
 
-	v, err = newStorage.Search(key)
+	v, err = newStorage.Search(context.TODO(), key)
 	if !IsNotFound(err) {
 		t.Fatal("expected", true, "got", false)
 	}

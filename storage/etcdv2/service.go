@@ -74,8 +74,8 @@ type Service struct {
 	prefix string
 }
 
-func (s *Service) Create(key, value string) error {
-	_, err := s.keyClient.Create(context.TODO(), s.key(key), value)
+func (s *Service) Create(ctx context.Context, key, value string) error {
+	_, err := s.keyClient.Create(ctx, s.key(key), value)
 	if IsEtcdKeyAlreadyExists(err) {
 		return nil
 	} else if err != nil {
@@ -85,11 +85,11 @@ func (s *Service) Create(key, value string) error {
 	return nil
 }
 
-func (s *Service) Delete(key string) error {
+func (s *Service) Delete(ctx context.Context, key string) error {
 	options := &client.DeleteOptions{
 		Recursive: true,
 	}
-	_, err := s.keyClient.Delete(context.TODO(), s.key(key), options)
+	_, err := s.keyClient.Delete(ctx, s.key(key), options)
 	if err != nil {
 		return microerror.MaskAny(err)
 	}
@@ -97,11 +97,11 @@ func (s *Service) Delete(key string) error {
 	return nil
 }
 
-func (s *Service) Exists(key string) (bool, error) {
+func (s *Service) Exists(ctx context.Context, key string) (bool, error) {
 	options := &client.GetOptions{
 		Quorum: true,
 	}
-	_, err := s.keyClient.Get(context.TODO(), s.key(key), options)
+	_, err := s.keyClient.Get(ctx, s.key(key), options)
 	if client.IsKeyNotFound(err) {
 		return false, nil
 	} else if err != nil {
@@ -111,12 +111,12 @@ func (s *Service) Exists(key string) (bool, error) {
 	return true, nil
 }
 
-func (s *Service) List(key string) ([]string, error) {
+func (s *Service) List(ctx context.Context, key string) ([]string, error) {
 	options := &client.GetOptions{
 		Recursive: true,
 		Quorum:    true,
 	}
-	resp, err := s.keyClient.Get(context.TODO(), s.key(key), options)
+	resp, err := s.keyClient.Get(ctx, s.key(key), options)
 	if client.IsKeyNotFound(err) {
 		return nil, microerror.MaskAny(notFoundError)
 	} else if err != nil {
@@ -145,11 +145,11 @@ func (s *Service) List(key string) ([]string, error) {
 	return children, nil
 }
 
-func (s *Service) Search(key string) (string, error) {
+func (s *Service) Search(ctx context.Context, key string) (string, error) {
 	options := &client.GetOptions{
 		Quorum: true,
 	}
-	clientResponse, err := s.keyClient.Get(context.TODO(), s.key(key), options)
+	clientResponse, err := s.keyClient.Get(ctx, s.key(key), options)
 	if client.IsKeyNotFound(err) {
 		return "", microerror.MaskAnyf(notFoundError, key)
 	} else if err != nil {

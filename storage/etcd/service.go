@@ -72,10 +72,10 @@ type Service struct {
 	prefix string
 }
 
-func (s *Service) Create(key, value string) error {
+func (s *Service) Create(ctx context.Context, key, value string) error {
 	key = s.key(key)
 
-	_, err := s.keyClient.Put(context.TODO(), key, value)
+	_, err := s.keyClient.Put(ctx, key, value)
 	if err != nil {
 		return microerror.MaskAny(err)
 	}
@@ -83,10 +83,10 @@ func (s *Service) Create(key, value string) error {
 	return nil
 }
 
-func (s *Service) Delete(key string) error {
+func (s *Service) Delete(ctx context.Context, key string) error {
 	key = s.key(key)
 
-	_, err := s.keyClient.Delete(context.TODO(), key)
+	_, err := s.keyClient.Delete(ctx, key)
 	if err != nil {
 		return microerror.MaskAny(err)
 	}
@@ -94,8 +94,8 @@ func (s *Service) Delete(key string) error {
 	return nil
 }
 
-func (s *Service) Exists(key string) (bool, error) {
-	_, err := s.Search(key)
+func (s *Service) Exists(ctx context.Context, key string) (bool, error) {
+	_, err := s.Search(ctx, key)
 	if IsNotFound(err) {
 		return false, nil
 	} else if err != nil {
@@ -105,14 +105,14 @@ func (s *Service) Exists(key string) (bool, error) {
 	return true, nil
 }
 
-func (s *Service) List(key string) ([]string, error) {
+func (s *Service) List(ctx context.Context, key string) ([]string, error) {
 	opts := []clientv3.OpOption{
 		clientv3.WithKeysOnly(),
 		clientv3.WithPrefix(),
 	}
 
 	key = s.key(key)
-	res, err := s.keyClient.Get(context.TODO(), key, opts...)
+	res, err := s.keyClient.Get(ctx, key, opts...)
 	if err != nil {
 		return nil, microerror.MaskAny(err)
 	}
@@ -148,8 +148,8 @@ func (s *Service) List(key string) ([]string, error) {
 	return list, nil
 }
 
-func (s *Service) Search(key string) (string, error) {
-	res, err := s.keyClient.Get(context.TODO(), s.key(key))
+func (s *Service) Search(ctx context.Context, key string) (string, error) {
+	res, err := s.keyClient.Get(ctx, s.key(key))
 	if err != nil {
 		return "", microerror.MaskAny(err)
 	}
