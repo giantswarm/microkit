@@ -86,6 +86,8 @@ type ResponseError interface {
 	// SetMessage tracks the given response message for the current response
 	// error. The given response message will be used for response creation.
 	SetMessage(message string)
+	// Underlying returns the actual underlying error.
+	Underlying() error
 }
 
 // ResponseWriter is a wrapper for http.ResponseWriter to track the written

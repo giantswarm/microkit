@@ -84,3 +84,7 @@ func (e *responseError) SetCode(code string) {
 func (e *responseError) SetMessage(message string) {
 	e.message = message
 }
+
+func (e *responseError) Underlying() error {
+	return e.underlying
+}
