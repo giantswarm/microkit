@@ -84,3 +84,12 @@ func (e *responseError) SetCode(code string) {
 func (e *responseError) SetMessage(message string) {
 	e.message = message
 }
+
+func (e *responseError) Underlying() error {
+	kErr, ok := e.underlying.(kithttp.Error)
+	if ok {
+		return kErr.Err
+	}
+
+	return e.underlying
+}
