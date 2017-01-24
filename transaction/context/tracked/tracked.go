@@ -15,12 +15,12 @@ type key string
 var trackedKey key = "tracked"
 
 // NewContext returns a new context.Context that carries value val.
-func NewContext(ctx context.Context, val string) context.Context {
+func NewContext(ctx context.Context, val bool) context.Context {
 	return context.WithValue(ctx, trackedKey, val)
 }
 
 // FromContext returns the context value stored in ctx, if any.
-func FromContext(ctx context.Context) (string, bool) {
-	val, ok := ctx.Value(trackedKey).(string)
+func FromContext(ctx context.Context) (bool, bool) {
+	val, ok := ctx.Value(trackedKey).(bool)
 	return val, ok
 }
