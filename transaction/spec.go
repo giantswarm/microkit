@@ -39,8 +39,14 @@ type Executer interface {
 // Responder is able to reply to requests for which transactions have been
 // tracked.
 type Responder interface {
-	// Track
+	// Exists checks whether a transaction response is stored under the given
+	// transaction ID.
+	Exists(ctx context.Context, transactionID string) (bool, error)
+	// Reply uses the information onbtained by the given response replier to
+	// create a response to reply to the current request.
 	Reply(ctx context.Context, transactionID string, rr ResponseReplier) error
+	// Track persists information obtained by the given response tracker to create
+	// a transaction response. This can be used to reply to upcoming requests.
 	Track(ctx context.Context, transactionID string, rt ResponseTracker) error
 }
 
