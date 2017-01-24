@@ -1,4 +1,4 @@
-// Package transaction provides trasnactional primitives to ensure certain
+// Package transaction provides transactional primitives to ensure certain
 // actions happen only ones.
 package transaction
 

@@ -40,11 +40,19 @@ type Executer interface {
 // tracked.
 type Responder interface {
 	// Track
-	Reply(ctx context.Context, rr ResponseReplier) error
-	Track(ctx context.Context, rt ResponseTracker) error
+	Reply(ctx context.Context, transactionID string, rr ResponseReplier) error
+	Track(ctx context.Context, transactionID string, rt ResponseTracker) error
 }
 
-// ResponseReplier TODO
+// Response is the transaction response object obtaining response relevant
+// information used to track responses and reply to requests.
+type Response struct {
+	Body   string              `json:"body"`
+	Code   int                 `json:"code"`
+	Header map[string][]string `json:"header"`
+}
+
+// ResponseReplier is used to create response information to reply to requests.
 type ResponseReplier interface {
 	// Header is only a wrapper around http.ResponseWriter.Header.
 	Header() http.Header
@@ -55,7 +63,7 @@ type ResponseReplier interface {
 	WriteHeader(c int)
 }
 
-// ResponseTracker TODO
+// ResponseTracker is used to track information about responses.
 type ResponseTracker interface {
 	// BodyBuffer returns the buffer which is used to track the bytes being
 	// written to the response.
