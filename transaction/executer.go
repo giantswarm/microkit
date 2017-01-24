@@ -87,11 +87,11 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 	// will be either set or empty. In case it is set we use it for the
 	// transaction below. In case it is not set at all, we simply want to execute
 	// the configured trial all the time.
-	transactionID, _ := transactionid.FromContext(ctx)
+	transactionID, ok := transactionid.FromContext(ctx)
 
 	// In case there is no transaction ID at all, we simply execute the trial all
 	// the time.
-	if transactionID == "" {
+	if !ok {
 		err := config.Trial(ctx)
 		if err != nil {
 			return microerror.MaskAny(err)
