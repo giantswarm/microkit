@@ -111,7 +111,7 @@ func Test_Transaction_IDGiven(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
-		r.Header.Add("X-Transaction-ID", "test-transaction-id")
+		r.Header.Add(TransactionIDHeader, "test-transaction-id")
 		w := httptest.NewRecorder()
 
 		newServer.Router().ServeHTTP(w, r)
@@ -147,7 +147,7 @@ func Test_Transaction_IDGiven(t *testing.T) {
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
-		r.Header.Add("X-Transaction-ID", "test-transaction-id")
+		r.Header.Add(TransactionIDHeader, "test-transaction-id")
 		w := httptest.NewRecorder()
 
 		newServer.Router().ServeHTTP(w, r)
