@@ -7,6 +7,9 @@ import (
 	kitendpoint "github.com/go-kit/kit/endpoint"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
+
+	micrologger "github.com/giantswarm/microkit/logger"
+	microtransaction "github.com/giantswarm/microkit/transaction"
 )
 
 // Endpoint represents the management of transport logic. An endpoint defines
@@ -50,6 +53,7 @@ type Server interface {
 	// not implement error response writing them self. This is done by the server
 	// itself. Duplicated response writing will lead to runtime panics.
 	ErrorEncoder() kithttp.ErrorEncoder
+	Logger() micrologger.Logger
 	// RequestFuncs returns the server's configured list of request functions.
 	// These are the custom request functions configured by the client.
 	RequestFuncs() []kithttp.RequestFunc
@@ -61,6 +65,7 @@ type Server interface {
 	ServiceName() string
 	// Shutdown stops the running server gracefully.
 	Shutdown()
+	TransactionResponder() microtransaction.Responder
 }
 
 // ResponseError is a wrapper for errors passed to the client's error encoder to
