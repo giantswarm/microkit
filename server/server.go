@@ -278,8 +278,14 @@ func (s *server) Boot() {
 					}(time.Now())
 				}
 
-				// TODO Here we know there does a transaction ID exist. We reply to the
-				// request using the stored transaction response and return.
+				// Here we wrap the endpoint's decoder. We check if there is a
+				// transaction response being tracked. In this case we reply to the
+				// current request with the tracked information of the transaction
+				// response. After that the endpoint and encoder is not executed. Only
+				// response functions, if any, will be executed as usual. If there is no
+				// transaction response being tracked, the request is processed
+				// normally. This means that the usual execution of the endpoints
+				// decoder, endpoint and encoder takes place.
 				wrappedDecoder := func(ctx context.Context, r *http.Request) (interface{}, error) {
 					tracked, ok := transactiontracked.FromContext(ctx)
 					if !ok {
@@ -306,7 +312,12 @@ func (s *server) Boot() {
 					return request, nil
 				}
 
-				// TODO
+				// Here we wrap the actual endpoint, the business logic. In case the
+				// response of the current request is known to be tracked, we skip the
+				// execution of the actual endpoint. We rely on the wrapped decoder
+				// above, which already prepared the reply of the current request. If
+				// there is no transaction response being tracked, we execute the actual
+				// endpoint as usual.
 				wrappedEndpoint := func(ctx context.Context, request interface{}) (interface{}, error) {
 					tracked, ok := transactiontracked.FromContext(ctx)
 					if !ok {
@@ -324,10 +335,15 @@ func (s *server) Boot() {
 					return response, nil
 				}
 
-				// TODO Here we know there does a transaction response is known. We
-				// already replied to the request using the stored transaction
-				// response within the wrapped decoder. Thus we do not have to do
-				// anything here.
+				// Here we wrap the endpoint's decoder. In case the response of the
+				// current request is known to be tracked, we skip the execution of the
+				// actual endpoint. We rely on the wrapped decoder above, which already
+				// prepared the reply of the current request. If there is no transaction
+				// response being tracked, we execute the actual encoder as usual. Its
+				// response is being tracked in case a transaction ID is provided in the
+				// given request context. This tracked transaction response is used to
+				// reply to upcoming requests that provide the same transaction ID
+				// again.
 				wrappedEncoder := func(ctx context.Context, w http.ResponseWriter, response interface{}) error {
 					tracked, ok := transactiontracked.FromContext(ctx)
 					if !ok {

@@ -24,6 +24,8 @@ func Test_Transaction_NoIDGiven(t *testing.T) {
 	newServer.Boot()
 	defer newServer.Shutdown()
 
+	// Here we make a request against our test endpoint. The endpoint is executed
+	// the first time. So the execution counts should be one.
 	{
 		r, err := http.NewRequest("GET", "/test-path", nil)
 		if err != nil {
@@ -55,6 +57,8 @@ func Test_Transaction_NoIDGiven(t *testing.T) {
 		}
 	}
 
+	// Here we make another request against our test endpoint. The endpoint is
+	// executed the second time. So the execution counts should be two.
 	{
 		r, err := http.NewRequest("GET", "/test-path", nil)
 		if err != nil {
@@ -100,6 +104,8 @@ func Test_Transaction_IDGiven(t *testing.T) {
 	newServer.Boot()
 	defer newServer.Shutdown()
 
+	// Here we make a request against our test endpoint. The endpoint is executed
+	// the first time. So the execution counts should be one.
 	{
 		r, err := http.NewRequest("GET", "/test-path", nil)
 		if err != nil {
@@ -132,6 +138,10 @@ func Test_Transaction_IDGiven(t *testing.T) {
 		}
 	}
 
+	// Here we make another request against our test endpoint. In this request and
+	// the previous one we provided the same transaction ID. The endpoint is now
+	// being executed the second time. So because we have our transaction response
+	// tracked, the execution counts should still be one.
 	{
 		r, err := http.NewRequest("GET", "/test-path", nil)
 		if err != nil {
