@@ -21,7 +21,9 @@ import (
 
 	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
+	micrologger "github.com/giantswarm/microkit/logger"
 	"github.com/giantswarm/microkit/transaction"
+	microtransaction "github.com/giantswarm/microkit/transaction"
 	transactionid "github.com/giantswarm/microkit/transaction/context/id"
 	transactiontracked "github.com/giantswarm/microkit/transaction/context/tracked"
 )
@@ -44,14 +46,34 @@ type Config struct {
 // DefaultConfig provides a default configuration to create a new server object
 // by best effort.
 func DefaultConfig() Config {
+	var err error
+
+	var loggerService micrologger.Logger
+	{
+		loggerConfig := micrologger.DefaultConfig()
+		loggerService, err = micrologger.New(loggerConfig)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	var responderService microtransaction.Responder
+	{
+		responderConfig := microtransaction.DefaultResponderConfig()
+		responderService, err = microtransaction.NewResponder(responderConfig)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	return Config{
 		// Dependencies.
 		Endpoints:            nil,
-		ErrorEncoder:         nil,
-		Logger:               nil,
-		RequestFuncs:         nil,
+		ErrorEncoder:         func(ctx context.Context, serverError error, w http.ResponseWriter) {},
+		Logger:               loggerService,
+		RequestFuncs:         []kithttp.RequestFunc{},
 		Router:               mux.NewRouter(),
-		TransactionResponder: nil,
+		TransactionResponder: responderService,
 
 		// Settings.
 		ListenAddress: "http://127.0.0.1:8000",
@@ -198,11 +220,16 @@ func (s *server) Boot() {
 				var err error
 
 				// Here we put the HTTP X-Transaction-ID header into the request
-				// context, if any. We also check if there is a response already tracked
-				// for the given transaction ID. This information is then stored within
-				// the given request context as well.
+				// context, if any. We also check if there is a transaction response
+				// already tracked for the given transaction ID. This information is
+				// then stored within the given request context as well. Note that we
+				// initialize the information about the tracked state of the transaction
+				// response with false, to always have a valid state available within
+				// the request context.
 				ctx := context.Background()
 				{
+					ctx = transactiontracked.NewContext(ctx, false)
+
 					transactionID := r.Header.Get("X-Transaction-ID")
 					if transactionID != "" {
 						ctx = transactionid.NewContext(ctx, transactionID)
@@ -232,12 +259,12 @@ func (s *server) Boot() {
 					}
 				}
 
-				// TODO
-				// Here we define the metrics relevant labels. These will be used to
-				// instrument the current request.
-				// This defered callback will be executed at the very end of the request.
-				// When it is executed we know all necessary information to instrument the
-				// complete request, including its response status code.
+				// Here we define the metrics labels. These will be used to instrument
+				// the current request. This defered callback is initialized with the
+				// timestamp of the beginning of the execution and will be executed at
+				// the very end of the request. When it is executed we know all
+				// necessary information to instrument the complete request, including
+				// its response status code.
 				{
 					defer func(t time.Time) {
 						endpointCode := strconv.Itoa(responseWriter.StatusCode())
