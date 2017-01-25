@@ -3,6 +3,8 @@
 package transaction
 
 import (
+	"fmt"
+
 	"golang.org/x/net/context"
 
 	microerror "github.com/giantswarm/microkit/error"
@@ -84,18 +86,17 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 
 	// At first we check for the transaction ID that might be obtained by the
 	// given context. We actually do not care about if there is one or not. It
-	// will be either set or empty. In case it is set we use it for the
-	// transaction below. In case it is not set at all, we simply want to execute
-	// the configured trial all the time.
+	// will be either set or empty. In case it is set, we use it for the execution
+	// of the transaction below. In case it is not set at all, we simply want to
+	// execute the configured trial all the time.
 	transactionID, ok := transactionid.FromContext(ctx)
-
-	// In case there is no transaction ID at all, we simply execute the trial all
-	// the time.
 	if !ok {
 		err := config.Trial(ctx)
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
+
+		e.logger.Log("debug", fmt.Sprintf("executed transaction trial for transaction ID %s and trial ID %s", transactionID, config.TrialID))
 
 		return nil
 	}
@@ -117,6 +118,8 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 				return microerror.MaskAny(err)
 			}
 
+			e.logger.Log("debug", fmt.Sprintf("executed transaction replay for transaction ID %s and trial ID %s", transactionID, config.TrialID))
+
 			return nil
 		}
 	}
@@ -137,6 +140,8 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
+
+		e.logger.Log("debug", fmt.Sprintf("executed transaction trial for transaction ID %s and trial ID %s", transactionID, config.TrialID))
 	}
 
 	return nil
