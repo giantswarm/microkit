@@ -11,9 +11,16 @@ import (
 type ExecuteConfig struct {
 	// Replay is the action being executed to replay a transaction result in case
 	// a former call to Trial was successful.
-	Replay func(context context.Context) error
+	Replay func(context context.Context, v interface{}) error
+	// ReplayDecoder is the decoder used to convert persisted trial outputs so
+	// they can be consumed by replay functions. The underlying type of the
+	// returned interface value is string.
+	ReplayDecoder func(b []byte) (interface{}, error)
 	// Trial is the action being executed to fulfil a transaction.
-	Trial func(context context.Context) error
+	Trial func(context context.Context) (interface{}, error)
+	// TrialEncoder is the encoder used to convert created trial outputs so they
+	// can be persisted.
+	TrialEncoder func(v interface{}) ([]byte, error)
 	// TrialID is an identifier scoped to the transaction ID obtained by the
 	// context provided to transaction.Executer.Execute. The trial ID is used to
 	// keep track of the state of the current transaction.

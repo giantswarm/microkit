@@ -3,6 +3,7 @@
 package transaction
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"golang.org/x/net/context"
@@ -12,6 +13,34 @@ import (
 	microstorage "github.com/giantswarm/microkit/storage"
 	transactionid "github.com/giantswarm/microkit/transaction/context/id"
 )
+
+// DefaultReplayDecoder is the default decoder used to convert persisted trial
+// outputs so they can be consumed by replay functions. The underlying type of
+// the returned interface value is string.
+var DefaultReplayDecoder = func(b []byte) (interface{}, error) {
+	return string(b), nil
+}
+
+// DefaultTrialEncoder is the default encoder used to convert created trial
+// outputs so they can be persisted.
+var DefaultTrialEncoder = func(v interface{}) ([]byte, error) {
+	b, ok := v.([]byte)
+	if ok {
+		return b, nil
+	}
+
+	s, ok := v.(string)
+	if ok {
+		return []byte(s), nil
+	}
+
+	b, err := json.Marshal(v)
+	if err != nil {
+		return nil, microerror.MaskAny(err)
+	}
+
+	return b, nil
+}
 
 // ExecuterConfig represents the configuration used to create a executer.
 type ExecuterConfig struct {
@@ -88,10 +117,12 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 	// given context. We actually do not care about if there is one or not. It
 	// will be either set or empty. In case it is set, we use it for the execution
 	// of the transaction below. In case it is not set at all, we simply want to
-	// execute the configured trial all the time.
+	// execute the configured trial all the time. Note that we also do not keep
+	// track of the trial result. There is no transaction ID so we have no
+	// reference we could use to track any information reliably.
 	transactionID, ok := transactionid.FromContext(ctx)
 	if !ok {
-		err := config.Trial(ctx)
+		_, err := config.Trial(ctx)
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
@@ -113,7 +144,17 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		}
 
 		if exists && config.Replay != nil {
-			err := config.Replay(ctx)
+			key := transactionKey("transaction", transactionID, "trial", config.TrialID, "result")
+			val, err := e.storage.Search(ctx, key)
+			if err != nil {
+				return microerror.MaskAny(err)
+			}
+
+			input, err := config.ReplayDecoder([]byte(val))
+			if err != nil {
+				return microerror.MaskAny(err)
+			}
+			err = config.Replay(ctx, input)
 			if err != nil {
 				return microerror.MaskAny(err)
 			}
@@ -130,18 +171,29 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 	// next time the transaction is being executed and the transaction's replay is
 	// being executed, if any.
 	{
-		err := config.Trial(ctx)
-		if err != nil {
-			return microerror.MaskAny(err)
-		}
-
-		key := transactionKey("transaction", transactionID, "trial", config.TrialID)
-		err = e.storage.Create(ctx, key, "{}")
+		output, err := config.Trial(ctx)
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
 
 		e.logger.Log("debug", fmt.Sprintf("executed transaction trial for transaction ID %s and trial ID %s", transactionID, config.TrialID))
+
+		rKey := transactionKey("transaction", transactionID, "trial", config.TrialID, "result")
+		b, err := config.TrialEncoder(output)
+		if err != nil {
+			return microerror.MaskAny(err)
+		}
+		rVal := string(b)
+		err = e.storage.Create(ctx, rKey, rVal)
+		if err != nil {
+			return microerror.MaskAny(err)
+		}
+
+		tKey := transactionKey("transaction", transactionID, "trial", config.TrialID)
+		err = e.storage.Create(ctx, tKey, "{}")
+		if err != nil {
+			return microerror.MaskAny(err)
+		}
 	}
 
 	return nil
@@ -149,15 +201,23 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 
 func (e *executer) ExecuteConfig() ExecuteConfig {
 	return ExecuteConfig{
-		Replay:  nil,
-		Trial:   nil,
-		TrialID: "",
+		Replay:        nil,
+		ReplayDecoder: DefaultReplayDecoder,
+		Trial:         nil,
+		TrialEncoder:  DefaultTrialEncoder,
+		TrialID:       "",
 	}
 }
 
 func validateExecuteConfig(config ExecuteConfig) error {
+	if config.Replay != nil && config.ReplayDecoder == nil {
+		return microerror.MaskAnyf(invalidExecutionError, "replay decoder must not be empty when replay is given")
+	}
 	if config.Trial == nil {
 		return microerror.MaskAnyf(invalidExecutionError, "trial must not be empty")
+	}
+	if config.TrialEncoder == nil {
+		return microerror.MaskAnyf(invalidExecutionError, "trial encoder must not be empty")
 	}
 	if config.TrialID == "" {
 		return microerror.MaskAnyf(invalidExecutionError, "trial ID must not be empty")
