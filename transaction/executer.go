@@ -130,7 +130,7 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
-		e.logger.Log("debug", fmt.Sprintf("executed transaction trial for transaction ID %s and trial ID %s", transactionID, config.TrialID))
+		e.logger.Log("debug", fmt.Sprintf("executed transaction trial without transaction ID for trial ID '%s'", config.TrialID))
 
 		return nil
 	}
@@ -172,7 +172,7 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 			if err != nil {
 				return microerror.MaskAny(err)
 			}
-			e.logger.Log("debug", fmt.Sprintf("executed transaction replay for transaction ID %s and trial ID %s", transactionID, config.TrialID))
+			e.logger.Log("debug", fmt.Sprintf("executed transaction replay for transaction ID '%s' and trial ID '%s'", transactionID, config.TrialID))
 
 			return nil
 		}
@@ -188,7 +188,7 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
-		e.logger.Log("debug", fmt.Sprintf("executed transaction trial for transaction ID %s and trial ID %s", transactionID, config.TrialID))
+		e.logger.Log("debug", fmt.Sprintf("executed transaction trial for transaction ID '%s' and trial ID '%s'", transactionID, config.TrialID))
 
 		rKey := transactionKey("transaction", transactionID, "trial", config.TrialID, "result")
 		b, err := config.TrialEncoder(output)

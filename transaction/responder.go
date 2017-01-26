@@ -123,7 +123,7 @@ func (r *responder) Reply(ctx context.Context, transactionID string, rr Response
 		}
 
 		key := responseKey("transaction", transactionID)
-		r.logger.Log("debug", fmt.Sprintf("replied using transaction response with key %s and value %#v", key, response))
+		r.logger.Log("debug", fmt.Sprintf("replied using transaction response with key '%s' and value '%#v'", key, response))
 	}
 
 	return nil
@@ -139,7 +139,7 @@ func (r *responder) Track(ctx context.Context, transactionID string, rt Response
 			return microerror.MaskAny(err)
 		}
 		if exists {
-			return microerror.MaskAnyf(alreadyExistsError, "transaction response for ID %s already exists", transactionID)
+			return microerror.MaskAnyf(alreadyExistsError, "transaction response for ID '%s' already exists", transactionID)
 		}
 	}
 
@@ -168,7 +168,7 @@ func (r *responder) Track(ctx context.Context, transactionID string, rt Response
 			return microerror.MaskAny(err)
 		}
 
-		r.logger.Log("debug", fmt.Sprintf("created transaction response with key %s and value %s", key, val))
+		r.logger.Log("debug", fmt.Sprintf("created transaction response with key '%s' and value '%s'", key, val))
 	}
 
 	return nil
