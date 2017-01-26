@@ -24,6 +24,10 @@ var DefaultReplayDecoder = func(b []byte) (interface{}, error) {
 // DefaultTrialEncoder is the default encoder used to convert created trial
 // outputs so they can be persisted.
 var DefaultTrialEncoder = func(v interface{}) ([]byte, error) {
+	if v == nil {
+		return nil, nil
+	}
+
 	b, ok := v.([]byte)
 	if ok {
 		return b, nil
@@ -126,7 +130,6 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
-
 		e.logger.Log("debug", fmt.Sprintf("executed transaction trial for transaction ID %s and trial ID %s", transactionID, config.TrialID))
 
 		return nil
@@ -144,21 +147,31 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		}
 
 		if exists && config.Replay != nil {
+			var notFound bool
 			key := transactionKey("transaction", transactionID, "trial", config.TrialID, "result")
 			val, err := e.storage.Search(ctx, key)
-			if err != nil {
+			if microstorage.IsNotFound(err) {
+				notFound = true
+			} else if err != nil {
 				return microerror.MaskAny(err)
 			}
 
-			input, err := config.ReplayDecoder([]byte(val))
-			if err != nil {
-				return microerror.MaskAny(err)
+			// Here it is important to only provide a none nil value to the replay
+			// function, if there is really some trial output persisted. This becomes
+			// important in cases in which one explicitly expects e.g. empty strings
+			// as trial output.
+			var input interface{}
+			if !notFound {
+				input, err = config.ReplayDecoder([]byte(val))
+				if err != nil {
+					return microerror.MaskAny(err)
+				}
 			}
+
 			err = config.Replay(ctx, input)
 			if err != nil {
 				return microerror.MaskAny(err)
 			}
-
 			e.logger.Log("debug", fmt.Sprintf("executed transaction replay for transaction ID %s and trial ID %s", transactionID, config.TrialID))
 
 			return nil
@@ -175,7 +188,6 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
-
 		e.logger.Log("debug", fmt.Sprintf("executed transaction trial for transaction ID %s and trial ID %s", transactionID, config.TrialID))
 
 		rKey := transactionKey("transaction", transactionID, "trial", config.TrialID, "result")
@@ -183,10 +195,12 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
-		rVal := string(b)
-		err = e.storage.Create(ctx, rKey, rVal)
-		if err != nil {
-			return microerror.MaskAny(err)
+		if b != nil {
+			rVal := string(b)
+			err = e.storage.Create(ctx, rKey, rVal)
+			if err != nil {
+				return microerror.MaskAny(err)
+			}
 		}
 
 		tKey := transactionKey("transaction", transactionID, "trial", config.TrialID)
