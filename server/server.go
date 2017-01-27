@@ -21,16 +21,28 @@ import (
 
 	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
+	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/giantswarm/microkit/transaction"
+	microtransaction "github.com/giantswarm/microkit/transaction"
+	transactionid "github.com/giantswarm/microkit/transaction/context/id"
+	transactiontracked "github.com/giantswarm/microkit/transaction/context/tracked"
+)
+
+const (
+	// TransactionIDHeader is the canonical representation of the transaction ID
+	// HTTP header field.
+	TransactionIDHeader = "X-Transaction-ID"
 )
 
 // Config represents the configuration used to create a new server object.
 type Config struct {
 	// Dependencies.
-	Endpoints    []Endpoint
-	ErrorEncoder kithttp.ErrorEncoder
-	Logger       logger.Logger
-	RequestFuncs []kithttp.RequestFunc
-	Router       *mux.Router
+	Endpoints            []Endpoint
+	ErrorEncoder         kithttp.ErrorEncoder
+	Logger               logger.Logger
+	RequestFuncs         []kithttp.RequestFunc
+	Router               *mux.Router
+	TransactionResponder transaction.Responder
 
 	// Settings.
 	ListenAddress string
@@ -40,13 +52,34 @@ type Config struct {
 // DefaultConfig provides a default configuration to create a new server object
 // by best effort.
 func DefaultConfig() Config {
+	var err error
+
+	var loggerService micrologger.Logger
+	{
+		loggerConfig := micrologger.DefaultConfig()
+		loggerService, err = micrologger.New(loggerConfig)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	var responderService microtransaction.Responder
+	{
+		responderConfig := microtransaction.DefaultResponderConfig()
+		responderService, err = microtransaction.NewResponder(responderConfig)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	return Config{
 		// Dependencies.
-		Endpoints:    nil,
-		ErrorEncoder: nil,
-		Logger:       nil,
-		RequestFuncs: nil,
-		Router:       mux.NewRouter(),
+		Endpoints:            nil,
+		ErrorEncoder:         func(ctx context.Context, serverError error, w http.ResponseWriter) {},
+		Logger:               loggerService,
+		RequestFuncs:         []kithttp.RequestFunc{},
+		Router:               mux.NewRouter(),
+		TransactionResponder: responderService,
 
 		// Settings.
 		ListenAddress: "http://127.0.0.1:8000",
@@ -72,6 +105,9 @@ func New(config Config) (Server, error) {
 	if config.Router == nil {
 		return nil, microerror.MaskAnyf(invalidConfigError, "router must not be empty")
 	}
+	if config.TransactionResponder == nil {
+		return nil, microerror.MaskAnyf(invalidConfigError, "transaction responder must not be empty")
+	}
 
 	// Settings.
 	if config.ListenAddress == "" {
@@ -87,16 +123,17 @@ func New(config Config) (Server, error) {
 	}
 
 	newServer := &server{
-		bootOnce:     sync.Once{},
-		endpoints:    config.Endpoints,
-		errorEncoder: config.ErrorEncoder,
-		httpServer:   nil,
-		listenURL:    listenURL,
-		logger:       config.Logger,
-		requestFuncs: config.RequestFuncs,
-		router:       config.Router,
-		serviceName:  config.ServiceName,
-		shutdownOnce: sync.Once{},
+		bootOnce:             sync.Once{},
+		endpoints:            config.Endpoints,
+		errorEncoder:         config.ErrorEncoder,
+		httpServer:           nil,
+		listenURL:            listenURL,
+		logger:               config.Logger,
+		requestFuncs:         config.RequestFuncs,
+		router:               config.Router,
+		serviceName:          config.ServiceName,
+		shutdownOnce:         sync.Once{},
+		transactionResponder: config.TransactionResponder,
 	}
 
 	return newServer, nil
@@ -104,16 +141,17 @@ func New(config Config) (Server, error) {
 
 // server manages the transport logic and endpoint registration.
 type server struct {
-	bootOnce     sync.Once
-	endpoints    []Endpoint
-	errorEncoder kithttp.ErrorEncoder
-	httpServer   *graceful.Server
-	listenURL    *url.URL
-	logger       logger.Logger
-	requestFuncs []kithttp.RequestFunc
-	router       *mux.Router
-	serviceName  string
-	shutdownOnce sync.Once
+	bootOnce             sync.Once
+	endpoints            []Endpoint
+	errorEncoder         kithttp.ErrorEncoder
+	httpServer           *graceful.Server
+	listenURL            *url.URL
+	logger               logger.Logger
+	requestFuncs         []kithttp.RequestFunc
+	router               *mux.Router
+	serviceName          string
+	shutdownOnce         sync.Once
+	transactionResponder transaction.Responder
 }
 
 func (s *server) Boot() {
@@ -155,6 +193,7 @@ func (s *server) Boot() {
 			decoder := e.Decoder()
 			encoder := e.Encoder()
 			endpoint := e.Endpoint()
+			errorEncoder := s.ErrorEncoder()
 			method := e.Method()
 			middlewares := e.Middlewares()
 			name := e.Name()
@@ -176,7 +215,7 @@ func (s *server) Boot() {
 			// Combine all options this server defines.
 			options := []kithttp.ServerOption{
 				kithttp.ServerBefore(s.RequestFuncs()...),
-				kithttp.ServerErrorEncoder(s.ErrorEncoder()),
+				kithttp.ServerErrorEncoder(errorEncoder),
 			}
 
 			// Register all endpoints to the router depending on their HTTP methods and
@@ -184,51 +223,169 @@ func (s *server) Boot() {
 			// prometheus. We track counts of execution and duration it took to complete
 			// the http.Handler.
 			s.router.Methods(method).Path(path).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				var err error
+
+				// Here we put the HTTP X-Transaction-ID header into the request
+				// context, if any. We also check if there is a transaction response
+				// already tracked for the given transaction ID. This information is
+				// then stored within the given request context as well. Note that we
+				// initialize the information about the tracked state of the transaction
+				// response with false, to always have a valid state available within
+				// the request context.
 				ctx := context.Background()
+				{
+					ctx = transactiontracked.NewContext(ctx, false)
+
+					transactionID := r.Header.Get(TransactionIDHeader)
+					if transactionID != "" {
+						ctx = transactionid.NewContext(ctx, transactionID)
+
+						exists, err := s.transactionResponder.Exists(ctx, transactionID)
+						if err != nil {
+							errorEncoder(ctx, err, w)
+							return
+						}
+						ctx = transactiontracked.NewContext(ctx, exists)
+					}
+				}
 
 				// Here we create a new wrapper for the http.ResponseWriter of the current
 				// request. We inject it into the called http.Handler so it can track the
 				// status code we are interested in. It will help us gathering the
 				// response status code after it was written by the underlying
 				// http.ResponseWriter.
-				responseWriterConfig := DefaultResponseWriterConfig()
-				responseWriterConfig.ResponseWriter = w
-				responseWriter, err := NewResponseWriter(responseWriterConfig)
-				if err != nil {
-					panic(err)
+				var responseWriter ResponseWriter
+				{
+					responseConfig := DefaultResponseWriterConfig()
+					responseConfig.ResponseWriter = w
+					responseWriter, err = NewResponseWriter(responseConfig)
+					if err != nil {
+						errorEncoder(ctx, err, w)
+						return
+					}
 				}
-				w = responseWriter
 
-				// Here we define the metrics relevant labels. These will be used to
-				// instrument the current request.
-				endpointName := strings.Replace(name, "/", "_", -1)
-				endpointMethod := strings.ToLower(method)
-				endpointCode := responseWriter.StatusCode()
+				// Here we define the metrics labels. These will be used to instrument
+				// the current request. This defered callback is initialized with the
+				// timestamp of the beginning of the execution and will be executed at
+				// the very end of the request. When it is executed we know all
+				// necessary information to instrument the complete request, including
+				// its response status code.
+				{
+					defer func(t time.Time) {
+						endpointCode := strconv.Itoa(responseWriter.StatusCode())
+						endpointMethod := strings.ToLower(method)
+						endpointName := strings.Replace(name, "/", "_", -1)
 
-				// This defered callback will be executed at the very end of the request.
-				// When it is executed we know all necessary information to instrument the
-				// complete request, including its response status code.
-				defer func(t time.Time) {
-					s.logger.Log("code", endpointCode, "endpoint", name, "method", endpointMethod, "path", r.URL.Path)
+						s.logger.Log("code", endpointCode, "endpoint", name, "method", endpointMethod, "path", r.URL.Path)
 
-					// At the time this code is executed the status code is properly set. So
-					// we can use it for our instrumentation.
-					endpointCode := strconv.Itoa(endpointCode)
-					endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
-					endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
-				}(time.Now())
+						endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
+						endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
+					}(time.Now())
+				}
 
-				// Now we execute the actual endpoint handler.
+				// Here we wrap the endpoint's decoder. We check if there is a
+				// transaction response being tracked. In this case we reply to the
+				// current request with the tracked information of the transaction
+				// response. After that the endpoint and encoder is not executed. Only
+				// response functions, if any, will be executed as usual. If there is no
+				// transaction response being tracked, the request is processed
+				// normally. This means that the usual execution of the endpoints
+				// decoder, endpoint and encoder takes place.
+				wrappedDecoder := func(ctx context.Context, r *http.Request) (interface{}, error) {
+					tracked, ok := transactiontracked.FromContext(ctx)
+					if !ok {
+						return nil, microerror.MaskAnyf(invalidContextError, "tracked must not be empty")
+					}
+					if tracked {
+						transactionID, ok := transactionid.FromContext(ctx)
+						if !ok {
+							return nil, microerror.MaskAnyf(invalidContextError, "transaction ID must not be empty")
+						}
+						err := s.transactionResponder.Reply(ctx, transactionID, responseWriter)
+						if err != nil {
+							return nil, microerror.MaskAny(err)
+						}
+
+						return nil, nil
+					}
+
+					request, err := decoder(ctx, r)
+					if err != nil {
+						return nil, microerror.MaskAny(err)
+					}
+
+					return request, nil
+				}
+
+				// Here we wrap the actual endpoint, the business logic. In case the
+				// response of the current request is known to be tracked, we skip the
+				// execution of the actual endpoint. We rely on the wrapped decoder
+				// above, which already prepared the reply of the current request. If
+				// there is no transaction response being tracked, we execute the actual
+				// endpoint as usual.
+				wrappedEndpoint := func(ctx context.Context, request interface{}) (interface{}, error) {
+					tracked, ok := transactiontracked.FromContext(ctx)
+					if !ok {
+						return nil, microerror.MaskAnyf(invalidContextError, "tracked must not be empty")
+					}
+					if tracked {
+						return nil, nil
+					}
+
+					response, err := endpoint(ctx, request)
+					if err != nil {
+						return nil, microerror.MaskAny(err)
+					}
+
+					return response, nil
+				}
+
+				// Here we wrap the endpoint's decoder. In case the response of the
+				// current request is known to be tracked, we skip the execution of the
+				// actual endpoint. We rely on the wrapped decoder above, which already
+				// prepared the reply of the current request. If there is no transaction
+				// response being tracked, we execute the actual encoder as usual. Its
+				// response is being tracked in case a transaction ID is provided in the
+				// given request context. This tracked transaction response is used to
+				// reply to upcoming requests that provide the same transaction ID
+				// again.
+				wrappedEncoder := func(ctx context.Context, w http.ResponseWriter, response interface{}) error {
+					tracked, ok := transactiontracked.FromContext(ctx)
+					if !ok {
+						return microerror.MaskAnyf(invalidContextError, "tracked must not be empty")
+					}
+					if tracked {
+						return nil
+					}
+
+					err := encoder(ctx, w, response)
+					if err != nil {
+						return microerror.MaskAny(err)
+					}
+
+					transactionID, ok := transactionid.FromContext(ctx)
+					if !ok {
+						// In case the response is not already tracked, but there is no
+						// transaction ID, we cannot track it at all. So we return here.
+						return nil
+					}
+					err = s.transactionResponder.Track(ctx, transactionID, responseWriter)
+					if err != nil {
+						return microerror.MaskAny(err)
+					}
+
+					return nil
+				}
+
+				// Now we execute the actual go-kit endpoint handler.
 				kithttp.NewServer(
 					ctx,
-					endpoint,
-					decoder,
-					encoder,
+					wrappedEndpoint,
+					wrappedDecoder,
+					wrappedEncoder,
 					options...,
-				).ServeHTTP(w, r)
-
-				// Here we now the status code.
-				endpointCode = responseWriter.StatusCode()
+				).ServeHTTP(responseWriter, r)
 			}))
 		}
 
@@ -310,6 +467,10 @@ func (s *server) ErrorEncoder() kithttp.ErrorEncoder {
 	}
 }
 
+func (s *server) Logger() micrologger.Logger {
+	return s.logger
+}
+
 func (s *server) RequestFuncs() []kithttp.RequestFunc {
 	return s.requestFuncs
 }
@@ -339,4 +500,8 @@ func (s *server) Shutdown() {
 
 		wg.Wait()
 	})
+}
+
+func (s *server) TransactionResponder() microtransaction.Responder {
+	return s.transactionResponder
 }

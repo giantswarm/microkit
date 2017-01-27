@@ -82,19 +82,20 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
+	customServer := c.serverFactory()
+
 	var newServer server.Server
 	{
-		customServer := c.serverFactory()
-
 		serverConfig := server.DefaultConfig()
 
 		serverConfig.Endpoints = customServer.Endpoints()
 		serverConfig.ErrorEncoder = customServer.ErrorEncoder()
 		serverConfig.ListenAddress = Flags.Server.Listen.Address
-		serverConfig.Logger = c.logger
+		serverConfig.Logger = customServer.Logger()
 		serverConfig.RequestFuncs = customServer.RequestFuncs()
 		serverConfig.Router = customServer.Router()
 		serverConfig.ServiceName = customServer.ServiceName()
+		serverConfig.TransactionResponder = customServer.TransactionResponder()
 
 		newServer, err = server.New(serverConfig)
 		if err != nil {

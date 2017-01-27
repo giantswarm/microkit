@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"net/http"
 
 	microerror "github.com/giantswarm/microkit/error"
@@ -10,6 +11,7 @@ import (
 // response writer.
 type ResponseWriterConfig struct {
 	// Settings.
+	BodyBuffer     *bytes.Buffer
 	ResponseWriter http.ResponseWriter
 	StatusCode     int
 }
@@ -19,6 +21,7 @@ type ResponseWriterConfig struct {
 func DefaultResponseWriterConfig() ResponseWriterConfig {
 	return ResponseWriterConfig{
 		// Settings.
+		BodyBuffer:     &bytes.Buffer{},
 		ResponseWriter: nil,
 		StatusCode:     http.StatusOK,
 	}
@@ -27,6 +30,9 @@ func DefaultResponseWriterConfig() ResponseWriterConfig {
 // New creates a new configured response writer.
 func NewResponseWriter(config ResponseWriterConfig) (ResponseWriter, error) {
 	// Settings.
+	if config.BodyBuffer == nil {
+		return nil, microerror.MaskAnyf(invalidConfigError, "body buffer must not be empty")
+	}
 	if config.ResponseWriter == nil {
 		return nil, microerror.MaskAnyf(invalidConfigError, "response writer must not be empty")
 	}
@@ -35,6 +41,8 @@ func NewResponseWriter(config ResponseWriterConfig) (ResponseWriter, error) {
 	}
 
 	newResponseWriter := &responseWriter{
+		// Settings.
+		bodyBuffer:     config.BodyBuffer,
 		responseWriter: config.ResponseWriter,
 		statusCode:     config.StatusCode,
 	}
@@ -43,8 +51,14 @@ func NewResponseWriter(config ResponseWriterConfig) (ResponseWriter, error) {
 }
 
 type responseWriter struct {
+	// Settings.
+	bodyBuffer     *bytes.Buffer
 	responseWriter http.ResponseWriter
 	statusCode     int
+}
+
+func (rw *responseWriter) BodyBuffer() *bytes.Buffer {
+	return rw.bodyBuffer
 }
 
 func (rw *responseWriter) Header() http.Header {
@@ -56,6 +70,11 @@ func (rw *responseWriter) StatusCode() int {
 }
 
 func (rw *responseWriter) Write(b []byte) (int, error) {
+	_, err := rw.bodyBuffer.Write(b)
+	if err != nil {
+		return 0, microerror.MaskAny(err)
+	}
+
 	return rw.responseWriter.Write(b)
 }
 

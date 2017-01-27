@@ -1,12 +1,12 @@
 hash: 7543d77ca0168ce51ff499acd07d597874fd2f539bc20d4e3018a49bac01f117
-updated: 2017-01-10T00:08:35.810603959+01:00
+updated: 2017-01-22T18:52:55.994378628+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
   subpackages:
   - quantile
 - name: github.com/coreos/etcd
-  version: 3d5ba43211beec7fbb1472634a9c3b464581658a
+  version: 8ba2897a21e4fc51b298ca553d251318425f93ae
   subpackages:
   - auth/authpb
   - client
@@ -53,7 +53,7 @@ imports:
   - runtime/internal
   - utilities
 - name: github.com/hashicorp/hcl
-  version: eb6f65b2d77ed5078887f960ff570fbddbbeb49d
+  version: 39fa3a62ba92cf550eb0f9cfb84757ef79b8aa30
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -70,17 +70,17 @@ imports:
 - name: github.com/kr/logfmt
   version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
 - name: github.com/magiconair/properties
-  version: 9c47895dc1ce54302908ab8a43385d1f5df2c11c
+  version: b3b15ef068fd0b17ddf408a23669f20811d194d2
 - name: github.com/matttproud/golang_protobuf_extensions
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
 - name: github.com/mitchellh/mapstructure
-  version: bfdb1a85537d60bc7e954e600c250219ea497417
+  version: ed105d635dfa9ea7133f7c79f1eb36203fc3a156
 - name: github.com/pelletier/go-buffruneio
   version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
 - name: github.com/pelletier/go-toml
-  version: 439fbba1f887c286024370cb4f281ba815c4c7d7
+  version: a1f048ba24490f9b0674a67e1ce995d685cddf4a
 - name: github.com/prometheus/client_golang
   version: c5b7fccd204277076155f10851dad72b76a49317
   subpackages:
@@ -117,19 +117,21 @@ imports:
 - name: github.com/spf13/viper
   version: 5ed0fc31f7f453625df314d8e66b9791e8d13003
 - name: github.com/tylerb/graceful
-  version: 50a48b6e73fcc75b45e22c05b79629a67c79e938
+  version: 0e9129e9c6d47da90dc0c188b26bd7bb1dab53cd
 - name: github.com/ugorji/go
-  version: f1f1a805ed361a0e078bb537e4ea78cd37dcf065
+  version: ded73eae5db7e7a0ef6f55aace87a2873c5d2b74
   subpackages:
   - codec
 - name: golang.org/x/net
-  version: 6acef71eb69611914f7a30939ea9f6e194c78172
+  version: f2499483f923065a842d38eb4c7f1927e6fc6e6d
   subpackages:
   - context
   - context/ctxhttp
   - http2
   - http2/hpack
+  - idna
   - internal/timeseries
+  - lex/httplex
   - trace
 - name: golang.org/x/sys
   version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
