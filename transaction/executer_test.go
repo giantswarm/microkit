@@ -169,6 +169,71 @@ func Test_Executer_TransactionIDGiven(t *testing.T) {
 	}
 }
 
+func Test_Executer_TransactionIDGiven_NoReplay(t *testing.T) {
+	config := DefaultExecuterConfig()
+	newExecuter, err := NewExecuter(config)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	var trialExecuted int
+
+	trial := func(context context.Context) (interface{}, error) {
+		trialExecuted++
+		return nil, nil
+	}
+
+	var ctx context.Context
+	var executeConfig ExecuteConfig
+	{
+		ctx = context.Background()
+		ctx = transactionid.NewContext(ctx, "test-transaction-id")
+
+		executeConfig = newExecuter.ExecuteConfig()
+		executeConfig.Trial = trial
+		executeConfig.TrialID = "test-trial-ID"
+	}
+
+	// The first execution of the transaction causes the trial to be executed
+	// once. There is no replay function.
+	{
+		err := newExecuter.Execute(ctx, executeConfig)
+		if err != nil {
+			t.Fatal("expected", nil, "got", err)
+		}
+
+		if trialExecuted != 1 {
+			t.Fatal("expected", 1, "got", trialExecuted)
+		}
+	}
+
+	// There is a transaction ID provided, so the trial is not executed again.
+	// There is no replay function.
+	{
+		err := newExecuter.Execute(ctx, executeConfig)
+		if err != nil {
+			t.Fatal("expected", nil, "got", err)
+		}
+
+		if trialExecuted != 1 {
+			t.Fatal("expected", 1, "got", trialExecuted)
+		}
+	}
+
+	// There is a transaction ID provided, so the trial is still not executed
+	// again. There is no replay function.
+	{
+		err := newExecuter.Execute(ctx, executeConfig)
+		if err != nil {
+			t.Fatal("expected", nil, "got", err)
+		}
+
+		if trialExecuted != 1 {
+			t.Fatal("expected", 1, "got", trialExecuted)
+		}
+	}
+}
+
 func Test_Executer_TransactionResult_Byte(t *testing.T) {
 	config := DefaultExecuterConfig()
 	newExecuter, err := NewExecuter(config)

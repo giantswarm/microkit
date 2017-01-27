@@ -146,7 +146,14 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 			return microerror.MaskAny(err)
 		}
 
-		if exists && config.Replay != nil {
+		if exists {
+			if config.Replay == nil {
+				// In case there is no replay function configured, we cannot execute it.
+				// Further, the trial function was already executed at this point, so we
+				// stop processing the transaction here.
+				return nil
+			}
+
 			var notFound bool
 			key := transactionKey("transaction", transactionID, "trial", config.TrialID, "result")
 			val, err := e.storage.Search(ctx, key)
