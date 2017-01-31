@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	kitendpoint "github.com/go-kit/kit/endpoint"
@@ -171,6 +172,45 @@ func Test_Transaction_IDGiven(t *testing.T) {
 
 		if w.Body.String() != "test-response-1" {
 			t.Fatal("expected", "test-response-1", "got", w.Body.String())
+		}
+	}
+}
+
+func Test_Transaction_InvalidIDGiven(t *testing.T) {
+	e := testNewEndpoint(t)
+
+	config := DefaultConfig()
+	config.Endpoints = []Endpoint{e}
+	config.ErrorEncoder = func(ctx context.Context, serverError error, w http.ResponseWriter) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	newServer, err := New(config)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	newServer.Boot()
+	defer newServer.Shutdown()
+
+	// Here we make a request against our test endpoint. The endpoint is provided
+	// with an invalid transaction ID. The server's error encoder returns status
+	// code 500 on all errors.
+	{
+		r, err := http.NewRequest("GET", "/test-path", nil)
+		if err != nil {
+			t.Fatal("expected", nil, "got", err)
+		}
+		r.Header.Add(TransactionIDHeader, "--my-invalid-transaction-id--")
+		w := httptest.NewRecorder()
+
+		newServer.Router().ServeHTTP(w, r)
+
+		if w.Code != http.StatusInternalServerError {
+			t.Fatal("expected", http.StatusInternalServerError, "got", w.Code)
+		}
+
+		if !strings.Contains(w.Body.String(), "invalid transaction ID: does not match") {
+			t.Fatal("expected", "invalid transaction ID: does not match", "got", w.Body.String())
 		}
 	}
 }
