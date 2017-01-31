@@ -58,3 +58,10 @@ var invalidContextError = errgo.New("invalid context")
 func IsInvalidContext(err error) bool {
 	return errgo.Cause(err) == invalidContextError
 }
+
+var invalidTransactionIDError = errgo.New("invalid transaction ID")
+
+// IsInvalidTransactionID asserts invalidTransactionIDError.
+func IsInvalidTransactionID(err error) bool {
+	return errgo.Cause(err) == invalidTransactionIDError
+}
