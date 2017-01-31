@@ -28,12 +28,6 @@ import (
 	transactiontracked "github.com/giantswarm/microkit/transaction/context/tracked"
 )
 
-const (
-	// TransactionIDHeader is the canonical representation of the transaction ID
-	// HTTP header field.
-	TransactionIDHeader = "X-Transaction-ID"
-)
-
 // Config represents the configuration used to create a new server object.
 type Config struct {
 	// Dependencies.
@@ -493,15 +487,21 @@ func (s *server) newRequestContext(w http.ResponseWriter, r *http.Request) (cont
 	ctx = transactiontracked.NewContext(ctx, false)
 
 	transactionID := r.Header.Get(TransactionIDHeader)
-	if transactionID != "" {
-		ctx = transactionid.NewContext(ctx, transactionID)
-
-		exists, err := s.transactionResponder.Exists(ctx, transactionID)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		ctx = transactiontracked.NewContext(ctx, exists)
+	if transactionID == "" {
+		return ctx, nil
 	}
+
+	if !IsValidTransactionID(transactionID) {
+		return nil, microerror.MaskAnyf(invalidTransactionIDError, "does not match %s", TransactionIDRegEx.String())
+	}
+
+	ctx = transactionid.NewContext(ctx, transactionID)
+
+	exists, err := s.transactionResponder.Exists(ctx, transactionID)
+	if err != nil {
+		return nil, microerror.MaskAny(err)
+	}
+	ctx = transactiontracked.NewContext(ctx, exists)
 
 	return ctx, nil
 }
