@@ -288,11 +288,13 @@ func (s *server) Boot() {
 				if err != nil {
 					panic(err)
 				}
+				s.logger.Log("debug", "running HTTPS server with TLS config")
 				err = s.httpServer.ListenAndServeTLSConfig(tlsConfig)
 				if err != nil {
 					panic(err)
 				}
 			} else {
+				s.logger.Log("debug", "running HTTP server")
 				err := s.httpServer.ListenAndServe()
 				if err != nil {
 					panic(err)
@@ -578,6 +580,7 @@ func (s *server) newTLSConfig() (*tls.Config, error) {
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
+		s.logger.Log("debug", fmt.Sprintf("found TLS root CA file '%s'", s.tlsCAFile))
 		roots.AddCert(c)
 	}
 
@@ -587,7 +590,8 @@ func (s *server) newTLSConfig() (*tls.Config, error) {
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
-		certs = []tls.Certificate{c}
+		s.logger.Log("debug", fmt.Sprintf("found TLS public key file '%s' and private key file '%s'", s.tlsCrtFile, s.tlsKeyFile))
+		certs = append(certs, c)
 	}
 
 	tlsConfig := &tls.Config{
