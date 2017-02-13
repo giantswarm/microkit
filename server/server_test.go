@@ -34,7 +34,7 @@ func Test_Transaction_NoIDGiven(t *testing.T) {
 		}
 		w := httptest.NewRecorder()
 
-		newServer.Router().ServeHTTP(w, r)
+		newServer.Config().Router.ServeHTTP(w, r)
 
 		if w.Code != http.StatusOK {
 			t.Fatal("expected", http.StatusOK, "got", w.Code)
@@ -67,7 +67,7 @@ func Test_Transaction_NoIDGiven(t *testing.T) {
 		}
 		w := httptest.NewRecorder()
 
-		newServer.Router().ServeHTTP(w, r)
+		newServer.Config().Router.ServeHTTP(w, r)
 
 		if w.Code != http.StatusOK {
 			t.Fatal("expected", http.StatusOK, "got", w.Code)
@@ -115,7 +115,7 @@ func Test_Transaction_IDGiven(t *testing.T) {
 		r.Header.Add(TransactionIDHeader, "my-very-valid-test-transaction-id")
 		w := httptest.NewRecorder()
 
-		newServer.Router().ServeHTTP(w, r)
+		newServer.Config().Router.ServeHTTP(w, r)
 
 		if w.Code != http.StatusOK {
 			t.Fatal("expected", http.StatusOK, "got", w.Code)
@@ -151,7 +151,7 @@ func Test_Transaction_IDGiven(t *testing.T) {
 		r.Header.Add(TransactionIDHeader, "my-very-valid-test-transaction-id")
 		w := httptest.NewRecorder()
 
-		newServer.Router().ServeHTTP(w, r)
+		newServer.Config().Router.ServeHTTP(w, r)
 
 		if w.Code != http.StatusOK {
 			t.Fatal("expected", http.StatusOK, "got", w.Code)
@@ -203,7 +203,7 @@ func Test_Transaction_InvalidIDGiven(t *testing.T) {
 		r.Header.Add(TransactionIDHeader, "--my-invalid-transaction-id--")
 		w := httptest.NewRecorder()
 
-		newServer.Router().ServeHTTP(w, r)
+		newServer.Config().Router.ServeHTTP(w, r)
 
 		if w.Code != http.StatusInternalServerError {
 			t.Fatal("expected", http.StatusInternalServerError, "got", w.Code)
