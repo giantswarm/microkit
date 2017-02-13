@@ -3,8 +3,11 @@
 package server
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -60,6 +63,13 @@ type Config struct {
 	// ServiceName is the name of the micro-service implementing the microkit
 	// server. This is used for logging and instrumentation.
 	ServiceName string
+	// TLSCAFile is the file path to the certificate root CA file, if any.
+	TLSCAFile string
+	// TLSKeyFilePath is the file path to the certificate public key file, if any.
+	TLSCrtFile string
+	// TLSKeyFilePath is the file path to the certificate private key file, if
+	// any.
+	TLSKeyFile string
 }
 
 // DefaultConfig provides a default configuration to create a new server object
@@ -97,6 +107,9 @@ func DefaultConfig() Config {
 		ListenAddress: "http://127.0.0.1:8000",
 		RequestFuncs:  []kithttp.RequestFunc{},
 		ServiceName:   "microkit",
+		TLSCAFile:     "",
+		TLSCrtFile:    "",
+		TLSKeyFile:    "",
 	}
 }
 
@@ -129,6 +142,12 @@ func New(config Config) (Server, error) {
 	if config.ServiceName == "" {
 		return nil, microerror.MaskAnyf(invalidConfigError, "service name must not be empty")
 	}
+	if config.TLSCrtFile == "" && config.TLSKeyFile != "" {
+		return nil, microerror.MaskAnyf(invalidConfigError, "TLS public key must not be empty")
+	}
+	if config.TLSCrtFile != "" && config.TLSKeyFile == "" {
+		return nil, microerror.MaskAnyf(invalidConfigError, "TLS private key must not be empty")
+	}
 
 	listenURL, err := url.Parse(config.ListenAddress)
 	if err != nil {
@@ -153,6 +172,9 @@ func New(config Config) (Server, error) {
 		endpoints:    config.Endpoints,
 		requestFuncs: config.RequestFuncs,
 		serviceName:  config.ServiceName,
+		tlsCAFile:    config.TLSCAFile,
+		tlsCrtFile:   config.TLSCrtFile,
+		tlsKeyFile:   config.TLSKeyFile,
 	}
 
 	return newServer, nil
@@ -177,6 +199,9 @@ type server struct {
 	endpoints    []Endpoint
 	requestFuncs []kithttp.RequestFunc
 	serviceName  string
+	tlsCAFile    string
+	tlsCrtFile   string
+	tlsKeyFile   string
 }
 
 func (s *server) Boot() {
@@ -258,9 +283,20 @@ func (s *server) Boot() {
 		}
 
 		go func() {
-			err := s.httpServer.ListenAndServe()
-			if err != nil {
-				panic(err)
+			if s.listenURL.Scheme == "https" {
+				tlsConfig, err := s.newTLSConfig()
+				if err != nil {
+					panic(err)
+				}
+				err = s.httpServer.ListenAndServeTLSConfig(tlsConfig)
+				if err != nil {
+					panic(err)
+				}
+			} else {
+				err := s.httpServer.ListenAndServe()
+				if err != nil {
+					panic(err)
+				}
 			}
 		}()
 	})
@@ -529,4 +565,35 @@ func (s *server) newResponseWriter(w http.ResponseWriter, r *http.Request) (Resp
 	}
 
 	return responseWriter, nil
+}
+
+func (s *server) newTLSConfig() (*tls.Config, error) {
+	roots := x509.NewCertPool()
+	if s.tlsCAFile != "" {
+		b, err := ioutil.ReadFile(s.tlsCAFile)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+		c, err := x509.ParseCertificate(b)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+		roots.AddCert(c)
+	}
+
+	var certs []tls.Certificate
+	if s.tlsCrtFile != "" && s.tlsKeyFile != "" {
+		c, err := tls.LoadX509KeyPair(s.tlsCrtFile, s.tlsKeyFile)
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
+		certs = []tls.Certificate{c}
+	}
+
+	tlsConfig := &tls.Config{
+		Certificates: certs,
+		RootCAs:      roots,
+	}
+
+	return tlsConfig, nil
 }
