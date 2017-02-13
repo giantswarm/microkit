@@ -570,18 +570,23 @@ func (s *server) newResponseWriter(w http.ResponseWriter, r *http.Request) (Resp
 }
 
 func (s *server) newTLSConfig() (*tls.Config, error) {
-	roots := x509.NewCertPool()
+	var err error
+
+	var roots *x509.CertPool
 	if s.tlsCAFile != "" {
+		roots, err = x509.SystemCertPool()
+		if err != nil {
+			return nil, microerror.MaskAny(err)
+		}
 		b, err := ioutil.ReadFile(s.tlsCAFile)
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}
-		c, err := x509.ParseCertificate(b)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
+		ok := roots.AppendCertsFromPEM(b)
+		if !ok {
+			return nil, microerror.MaskAny(fmt.Errorf("could not load root CA: '%s'", s.tlsCAFile))
 		}
 		s.logger.Log("debug", fmt.Sprintf("found TLS root CA file '%s'", s.tlsCAFile))
-		roots.AddCert(c)
 	}
 
 	var certs []tls.Certificate
