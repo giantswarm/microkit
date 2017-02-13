@@ -85,6 +85,7 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 	var newServer server.Server
 	{
 		serverConfig := c.serverFactory().Config()
+		serverConfig.ListenAddress = Flags.Server.Listen.Address
 		newServer, err = server.New(serverConfig)
 		if err != nil {
 			panic(err)
