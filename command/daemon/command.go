@@ -84,20 +84,7 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 
 	var newServer server.Server
 	{
-		serverConfig := server.DefaultConfig()
-
-		// Dependencies.
-		serverConfig.ErrorEncoder = c.serverFactory().Config().ErrorEncoder
-		serverConfig.Logger = c.serverFactory().Config().Logger
-		serverConfig.Router = c.serverFactory().Config().Router
-		serverConfig.TransactionResponder = c.serverFactory().Config().TransactionResponder
-
-		// Settings.
-		serverConfig.Endpoints = c.serverFactory().Config().Endpoints
-		serverConfig.ListenAddress = Flags.Server.Listen.Address
-		serverConfig.RequestFuncs = c.serverFactory().Config().RequestFuncs
-		serverConfig.ServiceName = c.serverFactory().Config().ServiceName
-
+		serverConfig := c.serverFactory().Config()
 		newServer, err = server.New(serverConfig)
 		if err != nil {
 			panic(err)
