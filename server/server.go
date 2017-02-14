@@ -217,55 +217,57 @@ func (s *server) Boot() {
 		// We go through all endpoints this server defines and register them to the
 		// router.
 		for _, e := range s.endpoints {
-			// Register all endpoints to the router depending on their HTTP methods and
-			// request paths. The registered http.Handler is instrumented using
-			// prometheus. We track counts of execution and duration it took to complete
-			// the http.Handler.
-			s.router.Methods(e.Method()).Path(e.Path()).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				ctx, err := s.newRequestContext(w, r)
-				if err != nil {
-					s.newErrorEncoderWrapper()(ctx, err, w)
-					return
-				}
+			func(e Endpoint) {
+				// Register all endpoints to the router depending on their HTTP methods and
+				// request paths. The registered http.Handler is instrumented using
+				// prometheus. We track counts of execution and duration it took to complete
+				// the http.Handler.
+				s.router.Methods(e.Method()).Path(e.Path()).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+					ctx, err := s.newRequestContext(w, r)
+					if err != nil {
+						s.newErrorEncoderWrapper()(ctx, err, w)
+						return
+					}
 
-				responseWriter, err := s.newResponseWriter(w, r)
-				if err != nil {
-					s.newErrorEncoderWrapper()(ctx, err, w)
-					return
-				}
+					responseWriter, err := s.newResponseWriter(w, r)
+					if err != nil {
+						s.newErrorEncoderWrapper()(ctx, err, w)
+						return
+					}
 
-				// Here we define the metrics labels. These will be used to instrument
-				// the current request. This defered callback is initialized with the
-				// timestamp of the beginning of the execution and will be executed at
-				// the very end of the request. When it is executed we know all
-				// necessary information to instrument the complete request, including
-				// its response status code.
-				defer func(t time.Time) {
-					endpointCode := strconv.Itoa(responseWriter.StatusCode())
-					endpointMethod := strings.ToLower(e.Method())
-					endpointName := strings.Replace(e.Name(), "/", "_", -1)
+					// Here we define the metrics labels. These will be used to instrument
+					// the current request. This defered callback is initialized with the
+					// timestamp of the beginning of the execution and will be executed at
+					// the very end of the request. When it is executed we know all
+					// necessary information to instrument the complete request, including
+					// its response status code.
+					defer func(t time.Time) {
+						endpointCode := strconv.Itoa(responseWriter.StatusCode())
+						endpointMethod := strings.ToLower(e.Method())
+						endpointName := strings.Replace(e.Name(), "/", "_", -1)
 
-					s.logger.Log("code", endpointCode, "endpoint", e.Name(), "method", endpointMethod, "path", r.URL.Path)
+						s.logger.Log("code", endpointCode, "endpoint", e.Name(), "method", endpointMethod, "path", r.URL.Path)
 
-					endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
-					endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
-				}(time.Now())
+						endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
+						endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
+					}(time.Now())
 
-				// Wrapp the custom implementations of the endpoint specific business
-				// logic.
-				wrappedDecoder := s.newDecoderWrapper(e, responseWriter)
-				wrappedEndpoint := s.newEndpointWrapper(e)
-				wrappedEncoder := s.newEncoderWrapper(e, responseWriter)
+					// Wrapp the custom implementations of the endpoint specific business
+					// logic.
+					wrappedDecoder := s.newDecoderWrapper(e, responseWriter)
+					wrappedEndpoint := s.newEndpointWrapper(e)
+					wrappedEncoder := s.newEncoderWrapper(e, responseWriter)
 
-				// Now we execute the actual go-kit endpoint handler.
-				kithttp.NewServer(
-					ctx,
-					wrappedEndpoint,
-					wrappedDecoder,
-					wrappedEncoder,
-					options...,
-				).ServeHTTP(responseWriter, r)
-			}))
+					// Now we execute the actual go-kit endpoint handler.
+					kithttp.NewServer(
+						ctx,
+						wrappedEndpoint,
+						wrappedDecoder,
+						wrappedEncoder,
+						options...,
+					).ServeHTTP(responseWriter, r)
+				}))
+			}(e)
 		}
 
 		// Register prometheus metrics endpoint.
