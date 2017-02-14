@@ -58,6 +58,9 @@ func New(config Config) (Command, error) {
 	newCommand.cobraCommand.PersistentFlags().StringSliceVar(&Flags.Config.Files, "config.files", []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
 
 	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.Listen.Address, "server.listen.address", "http://127.0.0.1:8000", "Address used to make the server listen to.")
+	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.TLS.CAFile, "server.tls.caFile", "", "File path of the TLS root CA file, if any.")
+	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.TLS.CrtFile, "server.tls.crtFile", "", "File path of the TLS public key file, if any.")
+	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.TLS.KeyFile, "server.tls.keyFile", "", "File path of the TLS private key file, if any.")
 
 	return newCommand, nil
 }
@@ -84,20 +87,11 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 
 	var newServer server.Server
 	{
-		serverConfig := server.DefaultConfig()
-
-		// Dependencies.
-		serverConfig.ErrorEncoder = c.serverFactory().Config().ErrorEncoder
-		serverConfig.Logger = c.serverFactory().Config().Logger
-		serverConfig.Router = c.serverFactory().Config().Router
-		serverConfig.TransactionResponder = c.serverFactory().Config().TransactionResponder
-
-		// Settings.
-		serverConfig.Endpoints = c.serverFactory().Config().Endpoints
+		serverConfig := c.serverFactory().Config()
 		serverConfig.ListenAddress = Flags.Server.Listen.Address
-		serverConfig.RequestFuncs = c.serverFactory().Config().RequestFuncs
-		serverConfig.ServiceName = c.serverFactory().Config().ServiceName
-
+		serverConfig.TLSCAFile = Flags.Server.TLS.CAFile
+		serverConfig.TLSCrtFile = Flags.Server.TLS.CrtFile
+		serverConfig.TLSKeyFile = Flags.Server.TLS.KeyFile
 		newServer, err = server.New(serverConfig)
 		if err != nil {
 			panic(err)

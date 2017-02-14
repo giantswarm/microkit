@@ -21,6 +21,11 @@ var Flags = struct {
 		Listen struct {
 			Address string
 		}
+		TLS struct {
+			CAFile  string
+			CrtFile string
+			KeyFile string
+		}
 	}
 }{}
 
