@@ -106,16 +106,14 @@ func DefaultConfig() Config {
 		TransactionResponder: responderService,
 
 		// Settings.
-		Endpoints: nil,
-		HandlerWrapper: func(h http.Handler) http.Handler {
-			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { h.ServeHTTP(w, r) })
-		},
-		ListenAddress: "http://127.0.0.1:8000",
-		RequestFuncs:  []kithttp.RequestFunc{},
-		ServiceName:   "microkit",
-		TLSCAFile:     "",
-		TLSCrtFile:    "",
-		TLSKeyFile:    "",
+		Endpoints:      nil,
+		HandlerWrapper: func(h http.Handler) http.Handler { return h },
+		ListenAddress:  "http://127.0.0.1:8000",
+		RequestFuncs:   []kithttp.RequestFunc{},
+		ServiceName:    "microkit",
+		TLSCAFile:      "",
+		TLSCrtFile:     "",
+		TLSKeyFile:     "",
 	}
 }
 
