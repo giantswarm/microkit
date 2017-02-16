@@ -72,6 +72,84 @@ func Test_Server_Endpoints(t *testing.T) {
 	}
 }
 
+// Test_Server_Default_HandlerWrapper verifies the default HandlerWrapper does
+// not do anything. This is the negative test for Test_Server_Custom_HandlerWrapper.
+func Test_Server_Default_HandlerWrapper(t *testing.T) {
+	e := testNewEndpoint(t)
+
+	config := DefaultConfig()
+	config.Endpoints = []Endpoint{e}
+	newServer, err := New(config)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	newServer.Boot()
+	defer newServer.Shutdown()
+
+	{
+		r, err := http.NewRequest("GET", "/test-path", nil)
+		if err != nil {
+			t.Fatal("expected", nil, "got", err)
+		}
+		w := httptest.NewRecorder()
+
+		newServer.Config().Router.ServeHTTP(w, r)
+
+		if w.Code != http.StatusOK {
+			t.Fatal("expected", http.StatusOK, "got", w.Code)
+		}
+
+		h := w.HeaderMap.Get("X-Test-Header")
+		if h != "" {
+			t.Fatal("expected", "no header", "got", h)
+		}
+	}
+}
+
+// Test_Server_Custom_HandlerWrapper verifies that the custom HandlerWrapper
+// does what it is supposed to do. In this test case it sets an additional
+// header to the request. In case our response recorder contains our expected
+// header, the test succeeds.
+func Test_Server_Custom_HandlerWrapper(t *testing.T) {
+	e := testNewEndpoint(t)
+
+	config := DefaultConfig()
+	config.Endpoints = []Endpoint{e}
+	config.HandlerWrapper = func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("X-Test-Header", "test value")
+			h.ServeHTTP(w, r)
+		})
+	}
+	newServer, err := New(config)
+	if err != nil {
+		t.Fatal("expected", nil, "got", err)
+	}
+
+	newServer.Boot()
+	defer newServer.Shutdown()
+
+	{
+		r, err := http.NewRequest("GET", "/test-path", nil)
+		if err != nil {
+			t.Fatal("expected", nil, "got", err)
+		}
+		w := httptest.NewRecorder()
+
+		newServer.Config().Router.ServeHTTP(w, r)
+
+		if w.Code != http.StatusOK {
+			t.Fatal("expected", http.StatusOK, "got", w.Code)
+		}
+
+		h := w.HeaderMap.Get("X-Test-Header")
+		if h != "test value" {
+			t.Fatal("expected", "no header", "got", h)
+		}
+	}
+}
+
 type testEndpoint struct {
 	decoderExecuted        int
 	decoderRequest         string

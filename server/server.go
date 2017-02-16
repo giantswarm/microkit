@@ -55,6 +55,9 @@ type Config struct {
 	// Endpoints is the server's configured list of endpoints. These are the
 	// custom endpoints configured by the client.
 	Endpoints []Endpoint
+	// HandlerWrapper is a wrapper provided to interact with the request on its
+	// roots.
+	HandlerWrapper func(h http.Handler) http.Handler
 	// ListenAddress is the address the server is listening on.
 	ListenAddress string
 	// RequestFuncs is the server's configured list of request functions. These
@@ -103,13 +106,14 @@ func DefaultConfig() Config {
 		TransactionResponder: responderService,
 
 		// Settings.
-		Endpoints:     nil,
-		ListenAddress: "http://127.0.0.1:8000",
-		RequestFuncs:  []kithttp.RequestFunc{},
-		ServiceName:   "microkit",
-		TLSCAFile:     "",
-		TLSCrtFile:    "",
-		TLSKeyFile:    "",
+		Endpoints:      nil,
+		HandlerWrapper: func(h http.Handler) http.Handler { return h },
+		ListenAddress:  "http://127.0.0.1:8000",
+		RequestFuncs:   []kithttp.RequestFunc{},
+		ServiceName:    "microkit",
+		TLSCAFile:      "",
+		TLSCrtFile:     "",
+		TLSKeyFile:     "",
 	}
 }
 
@@ -132,6 +136,9 @@ func New(config Config) (Server, error) {
 	// Settings.
 	if config.Endpoints == nil {
 		return nil, microerror.MaskAnyf(invalidConfigError, "endpoints must not be empty")
+	}
+	if config.HandlerWrapper == nil {
+		return nil, microerror.MaskAnyf(invalidConfigError, "handler wrapper must not be empty")
 	}
 	if config.ListenAddress == "" {
 		return nil, microerror.MaskAnyf(invalidConfigError, "listen address must not be empty")
@@ -169,12 +176,13 @@ func New(config Config) (Server, error) {
 		shutdownOnce: sync.Once{},
 
 		// Settings.
-		endpoints:    config.Endpoints,
-		requestFuncs: config.RequestFuncs,
-		serviceName:  config.ServiceName,
-		tlsCAFile:    config.TLSCAFile,
-		tlsCrtFile:   config.TLSCrtFile,
-		tlsKeyFile:   config.TLSKeyFile,
+		endpoints:      config.Endpoints,
+		handlerWrapper: config.HandlerWrapper,
+		requestFuncs:   config.RequestFuncs,
+		serviceName:    config.ServiceName,
+		tlsCAFile:      config.TLSCAFile,
+		tlsCrtFile:     config.TLSCrtFile,
+		tlsKeyFile:     config.TLSKeyFile,
 	}
 
 	return newServer, nil
@@ -196,12 +204,13 @@ type server struct {
 	shutdownOnce sync.Once
 
 	// Settings.
-	endpoints    []Endpoint
-	requestFuncs []kithttp.RequestFunc
-	serviceName  string
-	tlsCAFile    string
-	tlsCrtFile   string
-	tlsKeyFile   string
+	endpoints      []Endpoint
+	handlerWrapper func(h http.Handler) http.Handler
+	requestFuncs   []kithttp.RequestFunc
+	serviceName    string
+	tlsCAFile      string
+	tlsCrtFile     string
+	tlsKeyFile     string
 }
 
 func (s *server) Boot() {
@@ -222,7 +231,7 @@ func (s *server) Boot() {
 				// request paths. The registered http.Handler is instrumented using
 				// prometheus. We track counts of execution and duration it took to complete
 				// the http.Handler.
-				s.router.Methods(e.Method()).Path(e.Path()).Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				s.router.Methods(e.Method()).Path(e.Path()).Handler(s.handlerWrapper(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 					ctx, err := s.newRequestContext(w, r)
 					if err != nil {
 						s.newErrorEncoderWrapper()(ctx, err, w)
@@ -266,7 +275,7 @@ func (s *server) Boot() {
 						wrappedEncoder,
 						options...,
 					).ServeHTTP(responseWriter, r)
-				}))
+				})))
 			}(e)
 		}
 
