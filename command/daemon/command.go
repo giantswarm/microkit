@@ -60,13 +60,13 @@ func New(config Config) (Command, error) {
 		Run:   newCommand.Execute,
 	}
 
-	newCommand.cobraCommand.PersistentFlags().StringSliceVar(nil, Flag.Config.Dirs, []string{"."}, "List of config file directories.")
-	newCommand.cobraCommand.PersistentFlags().StringSliceVar(nil, Flag.Config.Files, []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
+	newCommand.cobraCommand.PersistentFlags().StringSlice(Flag.Config.Dirs, []string{"."}, "List of config file directories.")
+	newCommand.cobraCommand.PersistentFlags().StringSlice(Flag.Config.Files, []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
 
-	newCommand.cobraCommand.PersistentFlags().StringVar(nil, Flag.Server.Listen.Address, "http://127.0.0.1:8000", "Address used to make the server listen to.")
-	newCommand.cobraCommand.PersistentFlags().StringVar(nil, Flag.Server.TLS.CaFile, "", "File path of the TLS root CA file, if any.")
-	newCommand.cobraCommand.PersistentFlags().StringVar(nil, Flag.Server.TLS.CrtFile, "", "File path of the TLS public key file, if any.")
-	newCommand.cobraCommand.PersistentFlags().StringVar(nil, Flag.Server.TLS.KeyFile, "", "File path of the TLS private key file, if any.")
+	newCommand.cobraCommand.PersistentFlags().String(Flag.Server.Listen.Address, "http://127.0.0.1:8000", "Address used to make the server listen to.")
+	newCommand.cobraCommand.PersistentFlags().String(Flag.Server.TLS.CaFile, "", "File path of the TLS root CA file, if any.")
+	newCommand.cobraCommand.PersistentFlags().String(Flag.Server.TLS.CrtFile, "", "File path of the TLS public key file, if any.")
+	newCommand.cobraCommand.PersistentFlags().String(Flag.Server.TLS.KeyFile, "", "File path of the TLS private key file, if any.")
 
 	return newCommand, nil
 }
