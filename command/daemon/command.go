@@ -8,9 +8,15 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/giantswarm/microkit/command/daemon/flag"
 	microerror "github.com/giantswarm/microkit/error"
+	microflag "github.com/giantswarm/microkit/flag"
 	"github.com/giantswarm/microkit/logger"
 	"github.com/giantswarm/microkit/server"
+)
+
+var (
+	Flag = flag.New()
 )
 
 // Config represents the configuration used to create a new daemon command.
@@ -54,13 +60,13 @@ func New(config Config) (Command, error) {
 		Run:   newCommand.Execute,
 	}
 
-	newCommand.cobraCommand.PersistentFlags().StringSliceVar(&Flags.Config.Dirs, "config.dirs", []string{"."}, "List of config file directories.")
-	newCommand.cobraCommand.PersistentFlags().StringSliceVar(&Flags.Config.Files, "config.files", []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
+	newCommand.cobraCommand.PersistentFlags().StringSlice(Flag.Config.Dirs, []string{"."}, "List of config file directories.")
+	newCommand.cobraCommand.PersistentFlags().StringSlice(Flag.Config.Files, []string{"config"}, "List of the config file names. All viper supported extensions can be used.")
 
-	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.Listen.Address, "server.listen.address", "http://127.0.0.1:8000", "Address used to make the server listen to.")
-	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.TLS.CAFile, "server.tls.caFile", "", "File path of the TLS root CA file, if any.")
-	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.TLS.CrtFile, "server.tls.crtFile", "", "File path of the TLS public key file, if any.")
-	newCommand.cobraCommand.PersistentFlags().StringVar(&Flags.Server.TLS.KeyFile, "server.tls.keyFile", "", "File path of the TLS private key file, if any.")
+	newCommand.cobraCommand.PersistentFlags().String(Flag.Server.Listen.Address, "http://127.0.0.1:8000", "Address used to make the server listen to.")
+	newCommand.cobraCommand.PersistentFlags().String(Flag.Server.TLS.CaFile, "", "File path of the TLS root CA file, if any.")
+	newCommand.cobraCommand.PersistentFlags().String(Flag.Server.TLS.CrtFile, "", "File path of the TLS public key file, if any.")
+	newCommand.cobraCommand.PersistentFlags().String(Flag.Server.TLS.KeyFile, "", "File path of the TLS private key file, if any.")
 
 	return newCommand, nil
 }
@@ -77,10 +83,12 @@ func (c *command) CobraCommand() *cobra.Command {
 }
 
 func (c *command) Execute(cmd *cobra.Command, args []string) {
+	v := c.serverFactory().Config().Viper
+
 	// Merge the given command line flags with the given environment variables and
-	// the given config file, if any. The merged flags will be applied to the
-	// global Flags struct.
-	err := MergeFlags(cmd.Flags())
+	// the given config files, if any. The merged flags will be applied to the
+	// given viper.
+	err := microflag.Merge(v, cmd.Flags(), v.GetStringSlice(Flag.Config.Dirs), v.GetStringSlice(Flag.Config.Files))
 	if err != nil {
 		panic(err)
 	}
@@ -88,10 +96,10 @@ func (c *command) Execute(cmd *cobra.Command, args []string) {
 	var newServer server.Server
 	{
 		serverConfig := c.serverFactory().Config()
-		serverConfig.ListenAddress = Flags.Server.Listen.Address
-		serverConfig.TLSCAFile = Flags.Server.TLS.CAFile
-		serverConfig.TLSCrtFile = Flags.Server.TLS.CrtFile
-		serverConfig.TLSKeyFile = Flags.Server.TLS.KeyFile
+		serverConfig.ListenAddress = v.GetString(Flag.Server.Listen.Address)
+		serverConfig.TLSCAFile = v.GetString(Flag.Server.TLS.CaFile)
+		serverConfig.TLSCrtFile = v.GetString(Flag.Server.TLS.CrtFile)
+		serverConfig.TLSKeyFile = v.GetString(Flag.Server.TLS.KeyFile)
 		newServer, err = server.New(serverConfig)
 		if err != nil {
 			panic(err)
