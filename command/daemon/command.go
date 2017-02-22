@@ -103,9 +103,11 @@ func (c *command) CobraCommand() *cobra.Command {
 }
 
 func (c *command) Execute(cmd *cobra.Command, args []string) {
-	// TODO
+	// We have to parse the flags given via command line first. Only that way we
+	// are able to use the flag configuration for the location of configuration
+	// directories and files in the next step below.
 	microflag.Parse(c.viper, cmd.Flags())
-	// TODO
+
 	// Merge the given command line flags with the given environment variables and
 	// the given config files, if any. The merged flags will be applied to the
 	// given viper.
