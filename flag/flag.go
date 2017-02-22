@@ -35,9 +35,14 @@ func Init(f interface{}) {
 	}
 }
 
-// Merge merges the given flag set with an internal viper configuration. That
-// way command line flags, environment variables and config files will be
-// merged.
+func Parse(v *viper.Viper, fs *pflag.FlagSet) {
+	fs.VisitAll(func(f *pflag.Flag) {
+		if f.Changed || !v.IsSet(f.Name) {
+			v.Set(f.Name, f.Value.String())
+		}
+	})
+}
+
 func Merge(v *viper.Viper, fs *pflag.FlagSet, dirs, files []string) error {
 	// Use the given viper for internal configuration management. We merge the
 	// defined flags with their upper case counterparts from the environment.
@@ -62,23 +67,9 @@ func Merge(v *viper.Viper, fs *pflag.FlagSet, dirs, files []string) error {
 				return microerror.MaskAny(err)
 			}
 		}
-
-		fs.VisitAll(func(f *pflag.Flag) {
-			if f.Changed {
-				// The current flag was set via the command line. We definitly want to use
-				// the set value. Therefore we do not merge anything into it.
-				return
-			}
-			if !v.IsSet(f.Name) {
-				// There is neither configuration in the provided config file nor in the
-				// process environment. That means we cannot use it to merge it into any
-				// defined flag.
-				return
-			}
-
-			f.Value.Set(v.GetString(f.Name))
-		})
 	}
+
+	Parse(v, fs)
 
 	return nil
 }

@@ -2,6 +2,9 @@ package flag
 
 import (
 	"testing"
+
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 func Test_toCase(t *testing.T) {
@@ -130,6 +133,31 @@ func Test_Init(t *testing.T) {
 		if s != e {
 			t.Fatal("expected", e, "got", s)
 		}
+	}
+}
+
+func Test_Parse(t *testing.T) {
+	f := testFlag{}
+	Init(&f)
+
+	v := viper.New()
+
+	fs := pflag.NewFlagSet("test-flag-set", pflag.ContinueOnError)
+	expectedAddress := "http://127.0.0.1:8000"
+	fs.String(f.Server.Listen.Address, expectedAddress, "Test help usage.")
+	expectedFoo := 74
+	fs.Int(f.Foo, expectedFoo, "Test help usage.")
+
+	Parse(v, fs)
+
+	address := v.GetString(f.Server.Listen.Address)
+	if address != expectedAddress {
+		t.Fatal("expected", expectedAddress, "got", address)
+	}
+
+	foo := v.GetInt(f.Foo)
+	if foo != expectedFoo {
+		t.Fatal("expected", expectedFoo, "got", foo)
 	}
 }
 
