@@ -35,28 +35,23 @@ func Init(f interface{}) {
 }
 
 func Parse(v *viper.Viper, fs *pflag.FlagSet) {
-	fs.VisitAll(func(f *pflag.Flag) {
-		if f.Changed || !v.IsSet(f.Name) {
-			v.Set(f.Name, f.Value.String())
-		}
-	})
+	v.BindPFlags(fs)
 }
 
 func Merge(v *viper.Viper, fs *pflag.FlagSet, dirs, files []string) error {
-	// Use the given viper for internal configuration management. We merge the
-	// defined flags with their upper case counterparts from the environment.
-	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	v.AutomaticEnv()
-	v.BindPFlags(fs)
+	// We support multiple config files. Viper cannot do that on its own. So we
+	// configure a new viper for each config file that we are interested in and
+	// merge the found configurations into the viper given by the client.
+	for _, f := range files {
+		newViper := viper.New()
+		newViper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+		newViper.AutomaticEnv()
+		for _, configDir := range dirs {
+			newViper.AddConfigPath(configDir)
+		}
+		newViper.SetConfigName(f)
 
-	for _, configDir := range dirs {
-		v.AddConfigPath(configDir)
-	}
-
-	for _, configFile := range files {
-		// Check the defined config file.
-		v.SetConfigName(configFile)
-		err := v.ReadInConfig()
+		err := newViper.ReadInConfig()
 		if err != nil {
 			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 				// In case there is no config file given we simply go ahead to check
@@ -66,9 +61,13 @@ func Merge(v *viper.Viper, fs *pflag.FlagSet, dirs, files []string) error {
 				return microerror.MaskAny(err)
 			}
 		}
-	}
 
-	Parse(v, fs)
+		fs.VisitAll(func(f *pflag.Flag) {
+			if newViper.IsSet(f.Name) {
+				v.Set(f.Name, newViper.Get(f.Name))
+			}
+		})
+	}
 
 	return nil
 }
