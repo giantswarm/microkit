@@ -70,17 +70,17 @@ func Test_Init(t *testing.T) {
 		if s != e {
 			t.Fatal("expected", e, "got", s)
 		}
-		e = "server.tls.caFile"
+		e = "server.tls.cafile"
 		s = f.Server.TLS.CaFile
 		if s != e {
 			t.Fatal("expected", e, "got", s)
 		}
-		e = "server.tls.crtFile"
+		e = "server.tls.crtfile"
 		s = f.Server.TLS.CrtFile
 		if s != e {
 			t.Fatal("expected", e, "got", s)
 		}
-		e = "server.tls.keyFile"
+		e = "server.tls.keyfile"
 		s = f.Server.TLS.KeyFile
 		if s != e {
 			t.Fatal("expected", e, "got", s)
