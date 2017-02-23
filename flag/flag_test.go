@@ -7,49 +7,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Test_toCase(t *testing.T) {
-	testCases := []struct {
-		Input    string
-		Expected string
-	}{
-		{
-			Input:    "alllower",
-			Expected: "alllower",
-		},
-		{
-			Input:    "Title",
-			Expected: "title",
-		},
-		{
-			Input:    "weirD",
-			Expected: "weirD",
-		},
-		{
-			Input:    "ALLUPPER",
-			Expected: "allupper",
-		},
-		{
-			Input:    "FIRSTlower",
-			Expected: "firstlower",
-		},
-		{
-			Input:    "FIRSTlowerSuffix",
-			Expected: "firstlowerSuffix",
-		},
-		{
-			Input:    "FIRSTlowerUPPERSuffix",
-			Expected: "firstlowerUPPERSuffix",
-		},
-	}
-
-	for i, testCase := range testCases {
-		expected := toCase(testCase.Input)
-		if expected != testCase.Expected {
-			t.Fatal("case", i+1, "expected", testCase.Expected, "got", expected)
-		}
-	}
-}
-
 func Test_Init(t *testing.T) {
 	e := ""
 	f := testFlag{}
@@ -113,17 +70,17 @@ func Test_Init(t *testing.T) {
 		if s != e {
 			t.Fatal("expected", e, "got", s)
 		}
-		e = "server.tls.caFile"
+		e = "server.tls.cafile"
 		s = f.Server.TLS.CaFile
 		if s != e {
 			t.Fatal("expected", e, "got", s)
 		}
-		e = "server.tls.crtFile"
+		e = "server.tls.crtfile"
 		s = f.Server.TLS.CrtFile
 		if s != e {
 			t.Fatal("expected", e, "got", s)
 		}
-		e = "server.tls.keyFile"
+		e = "server.tls.keyfile"
 		s = f.Server.TLS.KeyFile
 		if s != e {
 			t.Fatal("expected", e, "got", s)
