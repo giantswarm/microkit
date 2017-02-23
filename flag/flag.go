@@ -3,7 +3,6 @@ package flag
 import (
 	"encoding/json"
 	"strings"
-	"unicode"
 
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -23,7 +22,7 @@ func Init(f interface{}) {
 	}
 
 	for k, v := range m {
-		m[k] = toValue([]string{toCase(k)}, k, v)
+		m[k] = toValue([]string{strings.ToLower(k)}, k, v)
 	}
 	b, err = json.Marshal(m)
 	if err != nil {
@@ -78,7 +77,7 @@ func toValue(path []string, key string, val interface{}) interface{} {
 	m, ok := val.(map[string]interface{})
 	if ok {
 		for k, v := range m {
-			m[k] = toValue(append([]string{toCase(k)}, path...), k, v)
+			m[k] = toValue(append([]string{strings.ToLower(k)}, path...), k, v)
 		}
 
 		return m
@@ -94,23 +93,4 @@ func reverse(s []string) []string {
 	}
 
 	return s
-}
-
-func toCase(k string) string {
-	a := []rune(k)
-	d := false
-
-	for i, c := range a {
-		if d {
-			return string(a)
-		}
-
-		if unicode.IsUpper(c) {
-			a[i] = unicode.ToLower(a[i])
-		} else {
-			d = true
-		}
-	}
-
-	return string(a)
 }
