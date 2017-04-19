@@ -1,6 +1,8 @@
 package server
 
 var (
+	// CodeFail indicates the requested action failed.
+	CodeFailure = "FAILURE"
 	// CodeInvalidCredentials indicates the provided credentials are not valid.
 	CodeInvalidCredentials = "INVALID_CREDENTIALS"
 	// CodePermissionDenied indicates the provided credentials are valid, but the
@@ -18,6 +20,8 @@ var (
 	CodeResourceNotFound = "RESOURCE_NOT_FOUND"
 	// CodeResourceUpdated indicates a resource has been updated.
 	CodeResourceUpdated = "RESOURCE_UPDATED"
+	// CodeSuccess indicates the requested action successed.
+	CodeSuccess = "SUCCESS"
 	// CodeUnknownAttribute indicates the provided data structure contains
 	// unexpected fields.
 	CodeUnknownAttribute = "UNKNOWN_ATTRIBUTE"
