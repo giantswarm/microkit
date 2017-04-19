@@ -81,6 +81,9 @@ type ResponseWriter interface {
 	// BodyBuffer returns the buffer which is used to track the bytes being
 	// written to the response.
 	BodyBuffer() *bytes.Buffer
+	// HasWritten expresses whether the underlying response writer has already
+	// written anything to the response body.
+	HasWritten() bool
 	// Header is only a wrapper around http.ResponseWriter.Header.
 	Header() http.Header
 	// StatusCode returns either the default status code of the one that was
