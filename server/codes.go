@@ -1,7 +1,7 @@
 package server
 
 var (
-	// CodeFail indicates the requested action failed.
+	// CodeFailure indicates the requested action failed.
 	CodeFailure = "FAILURE"
 	// CodeInvalidCredentials indicates the provided credentials are not valid.
 	CodeInvalidCredentials = "INVALID_CREDENTIALS"
@@ -27,4 +27,7 @@ var (
 	CodeUnknownAttribute = "UNKNOWN_ATTRIBUTE"
 	// CodeUnknownError indicates something went wrong in unpredictable ways.
 	CodeUnknownError = "UNKNOWN_ERROR"
+	// CodeInternalError represents an error we don't want to give more details
+	// abuot (usually HTTP status 500)
+	CodeInternalError = "INTERNAL_ERROR"
 )
