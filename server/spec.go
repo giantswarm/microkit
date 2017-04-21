@@ -50,7 +50,7 @@ type Server interface {
 // propagate specific response information in error cases.
 type ResponseError interface {
 	// Code returns the code being tracked using SetCode. If this code is not set
-	// using SetCode it defaults to CodeUnknownError.
+	// using SetCode it defaults to CodeInternalError.
 	Code() string
 	// Error returns the message of the underlying error.
 	Error() string
