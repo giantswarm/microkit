@@ -44,11 +44,11 @@ func ToImmutableAttributeError(err error) ImmutableAttributeError {
 // only the attributes that are allowed to be mutated. If the first map contains
 // fields which are not in the whitelist expected, an ImmutableAttributeError
 // is returned.
-func ValidateImmutableAttribute(received, whitelist map[string]interface{}) error {
+func ValidateImmutableAttribute(received, blacklist map[string]interface{}) error {
 	for r := range received {
 		var found bool
 
-		for e := range whitelist {
+		for e := range blacklist {
 			if e == r {
 				found = true
 				break
@@ -56,15 +56,14 @@ func ValidateImmutableAttribute(received, whitelist map[string]interface{}) erro
 		}
 
 		if found {
-			continue
+			err := ImmutableAttributeError{
+				attribute: r,
+				message:   fmt.Sprintf("attribute %s is immutable, you are not allowed to change it", r),
+			}
+
+			return microerror.MaskAny(err)
 		}
 
-		err := ImmutableAttributeError{
-			attribute: r,
-			message:   fmt.Sprintf("attribute %s is immutable, you are not allowed to change it", r),
-		}
-
-		return microerror.MaskAny(err)
 	}
 
 	return nil
