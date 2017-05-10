@@ -23,12 +23,12 @@ var (
 	// CodeSuccess indicates the requested action successed.
 	CodeSuccess = "SUCCESS"
 	// CodeImmutableAttribute indicates the provided data structure contains
-	// fields that are immutable
+	// fields that are immutable.
 	CodeImmutableAttribute = "IMMUTABLE_ATTRIBUTE"
 	// CodeUnknownAttribute indicates the provided data structure contains
 	// unexpected fields.
 	CodeUnknownAttribute = "UNKNOWN_ATTRIBUTE"
 	// CodeInternalError represents an error we don't want to give more details
-	// abuot (usually HTTP status 500)
+	// about (usually HTTP status 500).
 	CodeInternalError = "INTERNAL_ERROR"
 )
