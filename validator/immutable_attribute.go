@@ -15,7 +15,7 @@ type ImmutableAttributeError struct {
 	message   string
 }
 
-// Attribute returns the attribute that is causing the immutable attribute error
+// Attribute returns the attribute that is causing the immutable attribute error.
 func (e ImmutableAttributeError) Attribute() string {
 	return e.attribute
 }
@@ -26,7 +26,7 @@ func (e ImmutableAttributeError) Error() string {
 	return e.message
 }
 
-// IsImmutableAttributeError lets you check if an error is an ImmutableAttributeError
+// IsImmutableAttributeError lets you check if an error is an ImmutableAttributeError.
 func IsImmutableAttributeError(err error) bool {
 	_, ok := errgo.Cause(err).(ImmutableAttributeError)
 	return ok
@@ -34,7 +34,7 @@ func IsImmutableAttributeError(err error) bool {
 
 // ToImmutableAttributeError tries to cast a given error into a ImmutableAttributeError and
 // returns it. ToImmutableAttributeError will panic in case the underlying error is not of
-// type ToImmutableAttributeError. Use IsImmutableAttributeError before calling ToImmutableAttributeError
+// type ToImmutableAttributeError. Use IsImmutableAttributeError before calling ToImmutableAttributeError.
 func ToImmutableAttributeError(err error) ImmutableAttributeError {
 	return errgo.Cause(err).(ImmutableAttributeError)
 }

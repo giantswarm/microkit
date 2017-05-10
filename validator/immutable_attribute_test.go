@@ -11,7 +11,7 @@ func Test_ValidateImmutableAttribute(t *testing.T) {
 		ErrorMatcher   func(err error) bool
 		ErrorAttribute string
 	}{
-		// With no black list provided, it shouldn't complain at all
+		// With no black list provided, it shouldn't complain at all.
 		{
 			Received:       map[string]interface{}{"name": "Oliver", "age": 29},
 			Blacklist:      map[string]interface{}{},
@@ -20,7 +20,7 @@ func Test_ValidateImmutableAttribute(t *testing.T) {
 		},
 
 		// With an attribute in the black list that is not present in the received
-		// struct, it shouldn't complain at all
+		// struct, it shouldn't complain at all.
 		{
 			Received:       map[string]interface{}{"name": "Oliver", "age": 29},
 			Blacklist:      map[string]interface{}{"hairColor": ""},
@@ -29,7 +29,7 @@ func Test_ValidateImmutableAttribute(t *testing.T) {
 		},
 
 		// With an attribute in the black list that _is_ present in the received
-		// struct, it should return a ImmutableAttribute error
+		// struct, it should return a ImmutableAttribute error.
 		{
 			Received:       map[string]interface{}{"name": "Oliver", "age": 29},
 			Blacklist:      map[string]interface{}{"name": ""},
@@ -39,7 +39,7 @@ func Test_ValidateImmutableAttribute(t *testing.T) {
 
 		// With multiple attributes in the black list that are present in the received
 		// struct, it should return a ImmutableAttribute error for the first black listed
-		// attribute ordered alphabetically
+		// attribute ordered alphabetically.
 		{
 			Received:       map[string]interface{}{"name": "Oliver", "age": 29, "zebra": true},
 			Blacklist:      map[string]interface{}{"name": "", "age": 0, "zebra": false},
