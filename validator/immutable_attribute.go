@@ -2,6 +2,7 @@ package validator
 
 import (
 	"fmt"
+	"sort"
 
 	microerror "github.com/giantswarm/microkit/error"
 	"github.com/juju/errgo"
@@ -45,11 +46,19 @@ func ToImmutableAttributeError(err error) ImmutableAttributeError {
 // fields which are not in the whitelist expected, an ImmutableAttributeError
 // is returned.
 func ValidateImmutableAttribute(received, blacklist map[string]interface{}) error {
-	for r := range received {
+	alphabeticalBlacklist := make([]string, 0, len(blacklist))
+
+	for key := range blacklist {
+		alphabeticalBlacklist = append(alphabeticalBlacklist, key)
+	}
+
+	sort.Strings(alphabeticalBlacklist)
+
+	for _, blacklistedKey := range alphabeticalBlacklist {
 		var found bool
 
-		for e := range blacklist {
-			if e == r {
+		for recievedKey := range received {
+			if recievedKey == blacklistedKey {
 				found = true
 				break
 			}
@@ -57,8 +66,8 @@ func ValidateImmutableAttribute(received, blacklist map[string]interface{}) erro
 
 		if found {
 			err := ImmutableAttributeError{
-				attribute: r,
-				message:   fmt.Sprintf("attribute '%s' is immutable, you are not allowed to change it", r),
+				attribute: blacklistedKey,
+				message:   fmt.Sprintf("attribute '%s' is immutable, you are not allowed to change it", blacklistedKey),
 			}
 
 			return microerror.MaskAny(err)

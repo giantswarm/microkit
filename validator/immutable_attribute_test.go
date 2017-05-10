@@ -38,11 +38,12 @@ func Test_ValidateImmutableAttribute(t *testing.T) {
 		},
 
 		// With multiple attributes in the black list that are present in the received
-		// struct, it should return a ImmutableAttribute error
+		// struct, it should return a ImmutableAttribute error for the first black listed
+		// attribute ordered alphabetically
 		{
-			Received:       map[string]interface{}{"name": "Oliver", "age": 29},
-			Blacklist:      map[string]interface{}{"name": "", "age": 0},
-			ErrorAttribute: "name",
+			Received:       map[string]interface{}{"name": "Oliver", "age": 29, "zebra": true},
+			Blacklist:      map[string]interface{}{"name": "", "age": 0, "zebra": false},
+			ErrorAttribute: "age",
 			ErrorMatcher:   IsImmutableAttributeError,
 		},
 	}
