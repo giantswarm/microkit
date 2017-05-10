@@ -58,7 +58,7 @@ func ValidateImmutableAttribute(received, blacklist map[string]interface{}) erro
 		if found {
 			err := ImmutableAttributeError{
 				attribute: r,
-				message:   fmt.Sprintf("attribute %s is immutable, you are not allowed to change it", r),
+				message:   fmt.Sprintf("attribute '%s' is immutable, you are not allowed to change it", r),
 			}
 
 			return microerror.MaskAny(err)
