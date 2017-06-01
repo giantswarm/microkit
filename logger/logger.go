@@ -64,6 +64,10 @@ type logger struct {
 	Logger kitlog.Logger
 }
 
+func (l *logger) Decorate(keyvals ...interface{}) {
+	l.Logger = kitlog.NewContext(l.Logger).With(keyvals...)
+}
+
 func (l *logger) Log(keyvals ...interface{}) error {
 	return l.Logger.Log(keyvals...)
 }
