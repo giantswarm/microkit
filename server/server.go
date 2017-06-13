@@ -4,10 +4,8 @@ package server
 
 import (
 	"crypto/tls"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -593,39 +591,15 @@ func (s *server) newResponseWriter(w http.ResponseWriter) (ResponseWriter, error
 }
 
 func (s *server) newTLSConfig() (*tls.Config, error) {
-	var err error
-
-	var roots *x509.CertPool
-	if s.tlsCAFile != "" {
-		roots, err = x509.SystemCertPool()
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		b, err := ioutil.ReadFile(s.tlsCAFile)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		ok := roots.AppendCertsFromPEM(b)
-		if !ok {
-			return nil, microerror.MaskAny(fmt.Errorf("could not load root CA: '%s'", s.tlsCAFile))
-		}
-		s.logger.Log("debug", fmt.Sprintf("found TLS root CA file '%s'", s.tlsCAFile))
+	files := CertFiles{
+		RootCAs: []string{s.tlsCAFile},
+		Cert:    s.tlsCrtFile,
+		Key:     s.tlsKeyFile,
 	}
 
-	var certs []tls.Certificate
-	if s.tlsCrtFile != "" && s.tlsKeyFile != "" {
-		c, err := tls.LoadX509KeyPair(s.tlsCrtFile, s.tlsKeyFile)
-		if err != nil {
-			return nil, microerror.MaskAny(err)
-		}
-		s.logger.Log("debug", fmt.Sprintf("found TLS public key file '%s' and private key file '%s'", s.tlsCrtFile, s.tlsKeyFile))
-		certs = append(certs, c)
+	tlsConfig, err := LoadTLSConfig(files)
+	if err != nil {
+		return nil, microerror.MaskAny(err)
 	}
-
-	tlsConfig := &tls.Config{
-		Certificates: certs,
-		RootCAs:      roots,
-	}
-
 	return tlsConfig, nil
 }
