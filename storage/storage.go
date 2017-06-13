@@ -11,10 +11,10 @@ import (
 	"github.com/coreos/etcd/client"
 	"github.com/coreos/etcd/clientv3"
 	microerror "github.com/giantswarm/microkit/error"
-	"github.com/giantswarm/microkit/server"
 	"github.com/giantswarm/microkit/storage/etcd"
 	"github.com/giantswarm/microkit/storage/etcdv2"
 	"github.com/giantswarm/microkit/storage/memory"
+	microtls "github.com/giantswarm/microkit/tls"
 )
 
 const (
@@ -31,7 +31,7 @@ type Config struct {
 	// Settings.
 	EtcdAddress string
 	EtcdPrefix  string
-	EtcdTLS     server.CertFiles
+	EtcdTLS     microtls.CertFiles
 	Kind        string
 }
 
@@ -42,7 +42,7 @@ func DefaultConfig() Config {
 		// Settings.
 		EtcdAddress: "",
 		EtcdPrefix:  "",
-		EtcdTLS:     server.CertFiles{},
+		EtcdTLS:     microtls.CertFiles{},
 		Kind:        KindMemory,
 	}
 }
@@ -61,7 +61,7 @@ func New(config Config) (Service, error) {
 
 	var tlsConfig *tls.Config
 	{
-		tlsConfig, err = server.LoadTLSConfig(config.EtcdTLS)
+		tlsConfig, err = microtls.LoadTLSConfig(config.EtcdTLS)
 		if err != nil {
 			return nil, microerror.MaskAny(err)
 		}

@@ -1,4 +1,4 @@
-package server
+package tls
 
 import (
 	"crypto/tls"
