@@ -12,7 +12,6 @@ import (
 	microerror "github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command/daemon/flag"
 	microflag "github.com/giantswarm/microkit/flag"
-	"github.com/giantswarm/microkit/logger"
 	"github.com/giantswarm/microkit/server"
 )
 

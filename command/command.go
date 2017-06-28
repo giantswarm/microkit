@@ -8,7 +8,6 @@ import (
 	microerror "github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command/daemon"
 	"github.com/giantswarm/microkit/command/version"
-	"github.com/giantswarm/microkit/logger"
 )
 
 // Config represents the configuration used to create a new root command.

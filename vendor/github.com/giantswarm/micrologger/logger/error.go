@@ -1,4 +1,4 @@
-package logger
+package micrologger
 
 import (
 	"github.com/juju/errgo"

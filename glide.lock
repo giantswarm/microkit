@@ -1,5 +1,5 @@
-hash: 9df475204ed32ec52f7d24876f64004c0fe642c84d47c0b4aae42215948c3946
-updated: 2017-06-28T19:04:08.644867985+02:00
+hash: ca021490cfd41072cc0dd13054a212219679c72814033bb436d0752275addd3c
+updated: 2017-06-28T23:41:35.131180023+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -23,6 +23,10 @@ imports:
   version: 73d445a93680fa1a78ae23a5839bad48f32ba1ee
 - name: github.com/giantswarm/microerror
   version: 378330b8fbb6e2c74e57dd3a28be3dda39335949
+- name: github.com/giantswarm/micrologger
+  version: 070e8b462aab32278a34421eac176c1031700e16
+  subpackages:
+  - logger
 - name: github.com/go-kit/kit
   version: f66b0e13579bfc5a48b9e2a94b1209c107ea1f41
   subpackages:
