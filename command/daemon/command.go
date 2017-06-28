@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	microerror "github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command/daemon/flag"
-	microerror "github.com/giantswarm/microkit/error"
 	microflag "github.com/giantswarm/microkit/flag"
 	"github.com/giantswarm/microkit/logger"
 	"github.com/giantswarm/microkit/server"

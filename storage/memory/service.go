@@ -7,7 +7,7 @@ import (
 
 	"golang.org/x/net/context"
 
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 )
 
 // Config represents the configuration used to create a memory service.

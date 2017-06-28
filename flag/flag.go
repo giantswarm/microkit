@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 )
 
 func Init(f interface{}) {

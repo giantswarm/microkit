@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"net/http"
 
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 )
 
 // ResponseWriterConfig represents the configuration used to create a new

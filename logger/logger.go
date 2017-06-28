@@ -10,7 +10,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 	"github.com/go-stack/stack"
 
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 )
 
 // Config represents the configuration used to create a new logger.

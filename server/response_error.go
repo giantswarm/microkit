@@ -1,7 +1,7 @@
 package server
 
 import (
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 	kithttp "github.com/go-kit/kit/transport/http"
 )
 

@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 )
 
 // Config represents the configuration used to create a new version command.

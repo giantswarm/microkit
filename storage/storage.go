@@ -10,7 +10,7 @@ import (
 
 	"github.com/coreos/etcd/client"
 	"github.com/coreos/etcd/clientv3"
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/storage/etcd"
 	"github.com/giantswarm/microkit/storage/etcdv2"
 	"github.com/giantswarm/microkit/storage/memory"

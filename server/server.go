@@ -20,7 +20,7 @@ import (
 	"github.com/tylerb/graceful"
 	"golang.org/x/net/context"
 
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/logger"
 	micrologger "github.com/giantswarm/microkit/logger"
 	"github.com/giantswarm/microkit/tls"

@@ -5,9 +5,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	microerror "github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command/daemon"
 	"github.com/giantswarm/microkit/command/version"
-	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
 )
 
