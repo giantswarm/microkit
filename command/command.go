@@ -8,12 +8,13 @@ import (
 	microerror "github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command/daemon"
 	"github.com/giantswarm/microkit/command/version"
+	micrologger "github.com/giantswarm/micrologger/logger"
 )
 
 // Config represents the configuration used to create a new root command.
 type Config struct {
 	// Dependencies.
-	Logger        logger.Logger
+	Logger        micrologger.Logger
 	ServerFactory daemon.ServerFactory
 
 	// Settings.
