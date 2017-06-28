@@ -8,7 +8,7 @@ import (
 	"github.com/coreos/etcd/client"
 	"golang.org/x/net/context"
 
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 )
 
 // Config represents the configuration used to create a service.

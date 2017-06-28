@@ -20,14 +20,13 @@ import (
 	"github.com/tylerb/graceful"
 	"golang.org/x/net/context"
 
-	microerror "github.com/giantswarm/microkit/error"
-	"github.com/giantswarm/microkit/logger"
-	micrologger "github.com/giantswarm/microkit/logger"
+	microerror "github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/tls"
 	"github.com/giantswarm/microkit/transaction"
 	microtransaction "github.com/giantswarm/microkit/transaction"
 	transactionid "github.com/giantswarm/microkit/transaction/context/id"
 	transactiontracked "github.com/giantswarm/microkit/transaction/context/tracked"
+	micrologger "github.com/giantswarm/micrologger/logger"
 )
 
 // Config represents the configuration used to create a new server object.
@@ -196,7 +195,7 @@ func New(config Config) (Server, error) {
 type server struct {
 	// Dependencies.
 	errorEncoder         kithttp.ErrorEncoder
-	logger               logger.Logger
+	logger               micrologger.Logger
 	router               *mux.Router
 	transactionResponder transaction.Responder
 

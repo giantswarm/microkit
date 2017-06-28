@@ -3,7 +3,7 @@ package validator
 import (
 	"encoding/json"
 
-	microerror "github.com/giantswarm/microkit/error"
+	microerror "github.com/giantswarm/microerror"
 )
 
 // StructToMap is a helper method to convert an expected request data structure

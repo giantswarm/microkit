@@ -6,9 +6,9 @@ import (
 
 	"golang.org/x/net/context"
 
-	microerror "github.com/giantswarm/microkit/error"
-	micrologger "github.com/giantswarm/microkit/logger"
+	microerror "github.com/giantswarm/microerror"
 	microstorage "github.com/giantswarm/microkit/storage"
+	micrologger "github.com/giantswarm/micrologger/logger"
 )
 
 // ResponderConfig represents the configuration used to create a responder.
