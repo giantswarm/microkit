@@ -3,6 +3,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -18,7 +19,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/viper"
 	"github.com/tylerb/graceful"
-	"golang.org/x/net/context"
 
 	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
@@ -271,7 +271,6 @@ func (s *server) Boot() {
 
 					// Now we execute the actual go-kit endpoint handler.
 					kithttp.NewServer(
-						ctx,
 						wrappedEndpoint,
 						wrappedDecoder,
 						wrappedEncoder,
