@@ -14,11 +14,11 @@ func Test_List(t *testing.T) {
 
 	val := "my-val"
 
-	err = newStorage.Create(context.TODO(), "key/one", val)
+	err = newStorage.Set(context.TODO(), "key/one", val)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
-	err = newStorage.Create(context.TODO(), "key/two", val)
+	err = newStorage.Set(context.TODO(), "key/two", val)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
@@ -41,11 +41,11 @@ func Test_List_Invalid(t *testing.T) {
 
 	val := "my-val"
 
-	err = newStorage.Create(context.TODO(), "key/one", val)
+	err = newStorage.Set(context.TODO(), "key/one", val)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
-	err = newStorage.Create(context.TODO(), "key/two", val)
+	err = newStorage.Set(context.TODO(), "key/two", val)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}
@@ -73,7 +73,7 @@ func Test_Service(t *testing.T) {
 		t.Fatal("expected", false, "got", true)
 	}
 
-	err = newStorage.Create(context.TODO(), key, value)
+	err = newStorage.Set(context.TODO(), key, value)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
 	}

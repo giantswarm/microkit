@@ -203,14 +203,14 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 		}
 		if b != nil {
 			rVal := string(b)
-			err = e.storage.Create(ctx, rKey, rVal)
+			err = e.storage.Set(ctx, rKey, rVal)
 			if err != nil {
 				return microerror.MaskAny(err)
 			}
 		}
 
 		tKey := transactionKey("transaction", transactionID, "trial", config.TrialID)
-		err = e.storage.Create(ctx, tKey, "{}")
+		err = e.storage.Set(ctx, tKey, "{}")
 		if err != nil {
 			return microerror.MaskAny(err)
 		}
