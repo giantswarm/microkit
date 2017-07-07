@@ -162,7 +162,7 @@ func (r *responder) Track(ctx context.Context, transactionID string, rt Response
 	// Now we have all information in place to store the transaction response.
 	{
 		key := responseKey("transaction", transactionID)
-		err := r.storage.Create(ctx, key, val)
+		err := r.storage.Set(ctx, key, val)
 		if err != nil {
 			return microerror.MaskAny(err)
 		}

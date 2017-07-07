@@ -74,11 +74,9 @@ type Service struct {
 	prefix string
 }
 
-func (s *Service) Create(ctx context.Context, key, value string) error {
-	_, err := s.keyClient.Create(ctx, s.key(key), value)
-	if IsEtcdKeyAlreadyExists(err) {
-		return nil
-	} else if err != nil {
+func (s *Service) Set(ctx context.Context, key, value string) error {
+	_, err := s.keyClient.Set(ctx, s.key(key), value, &client.SetOptions{})
+	if err != nil {
 		return microerror.MaskAny(err)
 	}
 

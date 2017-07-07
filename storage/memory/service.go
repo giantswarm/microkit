@@ -36,7 +36,7 @@ type Service struct {
 	mutex   sync.Mutex
 }
 
-func (s *Service) Create(ctx context.Context, key, value string) error {
+func (s *Service) Set(ctx context.Context, key, value string) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 

@@ -72,7 +72,7 @@ type Service struct {
 	prefix string
 }
 
-func (s *Service) Create(ctx context.Context, key, value string) error {
+func (s *Service) Set(ctx context.Context, key, value string) error {
 	key = s.key(key)
 
 	_, err := s.keyClient.Put(ctx, key, value)
