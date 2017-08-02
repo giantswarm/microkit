@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	microerror "github.com/giantswarm/microkit/error"
+	"github.com/giantswarm/microerror"
 	micrologger "github.com/giantswarm/microkit/logger"
 	microstorage "github.com/giantswarm/microkit/storage"
 )
@@ -53,10 +53,10 @@ func DefaultResponderConfig() ResponderConfig {
 func NewResponder(config ResponderConfig) (Responder, error) {
 	// Dependencies.
 	if config.Logger == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "logger must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "logger must not be empty")
 	}
 	if config.Storage == nil {
-		return nil, microerror.MaskAnyf(invalidConfigError, "storage must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "storage must not be empty")
 	}
 
 	newResponder := &responder{
@@ -78,7 +78,7 @@ func (r *responder) Exists(ctx context.Context, transactionID string) (bool, err
 	key := responseKey("transaction", transactionID)
 	exists, err := r.storage.Exists(ctx, key)
 	if err != nil {
-		return false, microerror.MaskAny(err)
+		return false, microerror.Mask(err)
 	}
 
 	return exists, nil
@@ -93,14 +93,14 @@ func (r *responder) Reply(ctx context.Context, transactionID string, rr Response
 		key := responseKey("transaction", transactionID)
 		res, err := r.storage.Search(ctx, key)
 		if microstorage.IsNotFound(err) {
-			return microerror.MaskAny(notFoundError)
+			return microerror.Mask(notFoundError)
 		} else if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 
 		err = json.Unmarshal([]byte(res), &response)
 		if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 	}
 
@@ -118,7 +118,7 @@ func (r *responder) Reply(ctx context.Context, transactionID string, rr Response
 
 		_, err := rr.Write([]byte(response.Body))
 		if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 
 		key := responseKey("transaction", transactionID)
@@ -135,10 +135,10 @@ func (r *responder) Track(ctx context.Context, transactionID string, rt Response
 	{
 		exists, err := r.Exists(ctx, transactionID)
 		if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 		if exists {
-			return microerror.MaskAnyf(alreadyExistsError, "transaction response for ID '%s' already exists", transactionID)
+			return microerror.Maskf(alreadyExistsError, "transaction response for ID '%s' already exists", transactionID)
 		}
 	}
 
@@ -154,7 +154,7 @@ func (r *responder) Track(ctx context.Context, transactionID string, rt Response
 		}
 		b, err := json.Marshal(response)
 		if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 		val = string(b)
 	}
@@ -164,7 +164,7 @@ func (r *responder) Track(ctx context.Context, transactionID string, rt Response
 		key := responseKey("transaction", transactionID)
 		err := r.storage.Create(ctx, key, val)
 		if err != nil {
-			return microerror.MaskAny(err)
+			return microerror.Mask(err)
 		}
 
 		r.logger.Log("debug", fmt.Sprintf("created transaction response with key '%s' and value '%s'", key, val))

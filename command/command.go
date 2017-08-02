@@ -5,9 +5,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/command/daemon"
 	"github.com/giantswarm/microkit/command/version"
-	microerror "github.com/giantswarm/microkit/error"
 	"github.com/giantswarm/microkit/logger"
 )
 
@@ -56,7 +56,7 @@ func New(config Config) (Command, error) {
 
 		daemonCommand, err = daemon.New(daemonConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
@@ -71,7 +71,7 @@ func New(config Config) (Command, error) {
 
 		versionCommand, err = version.New(versionConfig)
 		if err != nil {
-			return nil, microerror.MaskAny(err)
+			return nil, microerror.Mask(err)
 		}
 	}
 
