@@ -8,7 +8,8 @@ import (
 	"fmt"
 
 	"github.com/giantswarm/microerror"
-	micrologger "github.com/giantswarm/microkit/logger"
+	"github.com/giantswarm/micrologger"
+
 	microstorage "github.com/giantswarm/microkit/storage"
 	transactionid "github.com/giantswarm/microkit/transaction/context/id"
 )

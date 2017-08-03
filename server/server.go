@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/giantswarm/micrologger"
 	kitendpoint "github.com/go-kit/kit/endpoint"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
@@ -21,8 +22,6 @@ import (
 	"github.com/tylerb/graceful"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/microkit/logger"
-	micrologger "github.com/giantswarm/microkit/logger"
 	"github.com/giantswarm/microkit/tls"
 	"github.com/giantswarm/microkit/transaction"
 	microtransaction "github.com/giantswarm/microkit/transaction"
@@ -196,7 +195,7 @@ func New(config Config) (Server, error) {
 type server struct {
 	// Dependencies.
 	errorEncoder         kithttp.ErrorEncoder
-	logger               logger.Logger
+	logger               micrologger.Logger
 	router               *mux.Router
 	transactionResponder transaction.Responder
 
