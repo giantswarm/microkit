@@ -1,5 +1,5 @@
 // Package logger implements a logging interface used to log messages.
-package logger
+package micrologger
 
 import (
 	"fmt"

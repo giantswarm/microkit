@@ -1,4 +1,4 @@
-package logger
+package micrologger
 
 // Logger is a simple interface describing services that emit messages to gather
 // certain runtime information.
