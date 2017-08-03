@@ -21,3 +21,5 @@ import:
   version: 3.2.1
 - package: golang.org/x/text
   version: 4ee4af566555f5fbe026368b75596286a312663a
+- package: github.com/giantswarm/micrologger
+  version: master

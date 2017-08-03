@@ -1,5 +1,5 @@
-hash: 984a81435eeead8962d2079eb259bb1c9456965b52ab0fa8d88d494e9317ee8e
-updated: 2017-08-02T20:37:17.110707532+02:00
+hash: 2bd8b0536ff4a8506aa3d4a7abfb5d29a7d9f025730065378089f58618f6a222
+updated: 2017-08-03T17:05:30.571895607+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -25,7 +25,9 @@ imports:
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
 - name: github.com/giantswarm/microerror
-  version: 7bf6a0a6d24b1e3a03af3ed3a8e3531d792ea3e3
+  version: 5ade94eb4ee35ef72eb9382228470caeddb29989
+- name: github.com/giantswarm/micrologger
+  version: 97740d3352f783c3b774db8bab314deff165f43b
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -35,9 +37,9 @@ imports:
 - name: github.com/go-logfmt/logfmt
   version: 390ab7935ee28ec6b286364bba9b4dd6410cb3d5
 - name: github.com/go-stack/stack
-  version: 54be5f394ed2c3e19dac9134a40a95ba5a017f7b
+  version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
 - name: github.com/golang/protobuf
-  version: 5a0f697c9ed9d68fef0116532c6e05cfeae00e55
+  version: 8616e8ee5e20a1704615e6c8d7afcdac06087a67
   subpackages:
   - proto
 - name: github.com/gorilla/context
@@ -146,5 +148,5 @@ imports:
   - tap
   - transport
 - name: gopkg.in/yaml.v2
-  version: 25c4ec802a7d637f88d584ab26798e94ad14c13b
+  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
 testImports: []
