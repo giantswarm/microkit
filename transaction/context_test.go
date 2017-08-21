@@ -42,7 +42,7 @@ func TestContext_TransactionID(t *testing.T) {
 
 	_, ok := GetTransactionID(ctx)
 	if !reflect.DeepEqual(false, ok) {
-		t.Fatalf("expected ok=%#v, got %#v", "", okt)
+		t.Fatalf("expected ok=%#v, got %#v", "", ok)
 	}
 
 	ctx = WithTransactionID(ctx, wid)
