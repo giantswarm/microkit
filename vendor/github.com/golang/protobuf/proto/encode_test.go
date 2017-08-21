@@ -1,6 +1,6 @@
 // Go support for Protocol Buffers - Google's data interchange format
 //
-// Copyright 2015 The Go Authors.  All rights reserved.
+// Copyright 2010 The Go Authors.  All rights reserved.
 // https://github.com/golang/protobuf
 //
 // Redistribution and use in source and binary forms, with or without
@@ -29,29 +29,55 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-syntax = "proto3";
+package proto_test
 
-package jsonpb;
+import (
+	"strconv"
+	"testing"
 
-message Simple3 {
-  double dub = 1;
+	"github.com/golang/protobuf/proto"
+	tpb "github.com/golang/protobuf/proto/proto3_proto"
+	"github.com/golang/protobuf/ptypes"
+)
+
+var (
+	blackhole []byte
+)
+
+// BenchmarkAny creates increasingly large arbitrary Any messages.  The type is always the
+// same.
+func BenchmarkAny(b *testing.B) {
+	data := make([]byte, 1<<20)
+	quantum := 1 << 10
+	for i := uint(0); i <= 10; i++ {
+		b.Run(strconv.Itoa(quantum<<i), func(b *testing.B) {
+			for k := 0; k < b.N; k++ {
+				inner := &tpb.Message{
+					Data: data[:quantum<<i],
+				}
+				outer, err := ptypes.MarshalAny(inner)
+				if err != nil {
+					b.Error("wrong encode", err)
+				}
+				raw, err := proto.Marshal(&tpb.Message{
+					Anything: outer,
+				})
+				if err != nil {
+					b.Error("wrong encode", err)
+				}
+				blackhole = raw
+			}
+		})
+	}
 }
 
-enum Numeral {
-  UNKNOWN = 0;
-  ARABIC = 1;
-  ROMAN = 2;
-}
-
-message Mappy {
-  map<int64, int32> nummy = 1;
-  map<string, string> strry = 2;
-  map<int32, Simple3> objjy = 3;
-  map<int64, string> buggy = 4;
-  map<bool, bool> booly = 5;
-  map<string, Numeral> enumy = 6;
-  map<int32, bool> s32booly = 7;
-  map<int64, bool> s64booly = 8;
-  map<uint32, bool> u32booly = 9;
-  map<uint64, bool> u64booly = 10;
+// BenchmarkEmpy measures the overhead of doing the minimal possible encode.
+func BenchmarkEmpy(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		raw, err := proto.Marshal(&tpb.Message{})
+		if err != nil {
+			b.Error("wrong encode", err)
+		}
+		blackhole = raw
+	}
 }
