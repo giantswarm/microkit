@@ -11,7 +11,6 @@ import (
 	"github.com/giantswarm/micrologger"
 
 	microstorage "github.com/giantswarm/microkit/storage"
-	transactionid "github.com/giantswarm/microkit/transaction/context/id"
 )
 
 // DefaultReplayDecoder is the default decoder used to convert persisted trial
@@ -124,7 +123,7 @@ func (e *executer) Execute(ctx context.Context, config ExecuteConfig) error {
 	// execute the configured trial all the time. Note that we also do not keep
 	// track of the trial result. There is no transaction ID so we have no
 	// reference we could use to track any information reliably.
-	transactionID, ok := transactionid.FromContext(ctx)
+	transactionID, ok := GetTransactionID(ctx)
 	if !ok {
 		_, err := config.Trial(ctx)
 		if err != nil {

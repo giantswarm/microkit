@@ -4,8 +4,6 @@ import (
 	"context"
 	"reflect"
 	"testing"
-
-	transactionid "github.com/giantswarm/microkit/transaction/context/id"
 )
 
 func Test_Executer_NoTransactionIDGiven(t *testing.T) {
@@ -110,7 +108,7 @@ func Test_Executer_TransactionIDGiven(t *testing.T) {
 	var executeConfig ExecuteConfig
 	{
 		ctx = context.Background()
-		ctx = transactionid.NewContext(ctx, "test-transaction-id")
+		ctx = WithTransactionID(ctx, "test-transaction-id")
 
 		executeConfig = newExecuter.ExecuteConfig()
 		executeConfig.Replay = replay
@@ -185,7 +183,7 @@ func Test_Executer_TransactionIDGiven_NoReplay(t *testing.T) {
 	var executeConfig ExecuteConfig
 	{
 		ctx = context.Background()
-		ctx = transactionid.NewContext(ctx, "test-transaction-id")
+		ctx = WithTransactionID(ctx, "test-transaction-id")
 
 		executeConfig = newExecuter.ExecuteConfig()
 		executeConfig.Trial = trial
@@ -290,7 +288,7 @@ func Test_Executer_TransactionResult(t *testing.T) {
 		var executeConfig ExecuteConfig
 		{
 			ctx = context.Background()
-			ctx = transactionid.NewContext(ctx, "test-transaction-id")
+			ctx = WithTransactionID(ctx, "test-transaction-id")
 
 			executeConfig = newExecuter.ExecuteConfig()
 			executeConfig.Replay = replay
