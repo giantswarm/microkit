@@ -23,10 +23,7 @@ import (
 
 	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/tls"
-	"github.com/giantswarm/microkit/transaction"
 	microtransaction "github.com/giantswarm/microkit/transaction"
-	transactionid "github.com/giantswarm/microkit/transaction/context/id"
-	transactiontracked "github.com/giantswarm/microkit/transaction/context/tracked"
 )
 
 // Config represents the configuration used to create a new server object.
@@ -197,7 +194,7 @@ type server struct {
 	errorEncoder         kithttp.ErrorEncoder
 	logger               micrologger.Logger
 	router               *mux.Router
-	transactionResponder transaction.Responder
+	transactionResponder microtransaction.Responder
 
 	// Internals.
 	bootOnce     sync.Once
@@ -415,12 +412,12 @@ func (s *server) newErrorEncoderWrapper() kithttp.ErrorEncoder {
 // endpoint and encoder takes place.
 func (s *server) newDecoderWrapper(e Endpoint, responseWriter ResponseWriter) kithttp.DecodeRequestFunc {
 	return func(ctx context.Context, r *http.Request) (interface{}, error) {
-		tracked, ok := transactiontracked.FromContext(ctx)
+		tracked, ok := microtransaction.GetTracked(ctx)
 		if !ok {
 			return nil, microerror.Maskf(invalidContextError, "tracked must not be empty")
 		}
 		if tracked {
-			transactionID, ok := transactionid.FromContext(ctx)
+			transactionID, ok := microtransaction.GetTransactionID(ctx)
 			if !ok {
 				return nil, microerror.Maskf(invalidContextError, "transaction ID must not be empty")
 			}
@@ -452,7 +449,7 @@ func (s *server) newDecoderWrapper(e Endpoint, responseWriter ResponseWriter) ki
 // transaction ID again.
 func (s *server) newEncoderWrapper(e Endpoint, responseWriter ResponseWriter) kithttp.EncodeResponseFunc {
 	return func(ctx context.Context, w http.ResponseWriter, response interface{}) error {
-		tracked, ok := transactiontracked.FromContext(ctx)
+		tracked, ok := microtransaction.GetTracked(ctx)
 		if !ok {
 			return microerror.Maskf(invalidContextError, "tracked must not be empty")
 		}
@@ -465,7 +462,7 @@ func (s *server) newEncoderWrapper(e Endpoint, responseWriter ResponseWriter) ki
 			return microerror.Mask(err)
 		}
 
-		transactionID, ok := transactionid.FromContext(ctx)
+		transactionID, ok := microtransaction.GetTransactionID(ctx)
 		if !ok {
 			// In case the response is not already tracked, but there is no
 			// transaction ID, we cannot track it at all. So we return here.
@@ -488,7 +485,7 @@ func (s *server) newEncoderWrapper(e Endpoint, responseWriter ResponseWriter) ki
 // execute the actual endpoint as usual.
 func (s *server) newEndpointWrapper(e Endpoint) kitendpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		tracked, ok := transactiontracked.FromContext(ctx)
+		tracked, ok := microtransaction.GetTracked(ctx)
 		if !ok {
 			return nil, microerror.Maskf(invalidContextError, "tracked must not be empty")
 		}
@@ -558,7 +555,7 @@ func (s *server) newNotFoundHandler() http.Handler {
 // to always have a valid state available within the request context.
 func (s *server) newRequestContext(w http.ResponseWriter, r *http.Request) (context.Context, error) {
 	ctx := context.Background()
-	ctx = transactiontracked.NewContext(ctx, false)
+	ctx = microtransaction.WithTracked(ctx, false)
 
 	transactionID := r.Header.Get(TransactionIDHeader)
 	if transactionID == "" {
@@ -569,13 +566,13 @@ func (s *server) newRequestContext(w http.ResponseWriter, r *http.Request) (cont
 		return nil, microerror.Maskf(invalidTransactionIDError, "does not match %s", TransactionIDRegEx.String())
 	}
 
-	ctx = transactionid.NewContext(ctx, transactionID)
+	ctx = microtransaction.WithTransactionID(ctx, transactionID)
 
 	exists, err := s.transactionResponder.Exists(ctx, transactionID)
 	if err != nil {
 		return nil, microerror.Mask(err)
 	}
-	ctx = transactiontracked.NewContext(ctx, exists)
+	ctx = microtransaction.WithTracked(ctx, exists)
 
 	return ctx, nil
 }
