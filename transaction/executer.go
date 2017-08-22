@@ -58,8 +58,8 @@ type ExecuterConfig struct {
 func DefaultExecuterConfig() ExecuterConfig {
 	return ExecuterConfig{
 		// Dependencies.
-		Logger:  nil, // Required.
-		Storage: nil, // Required.
+		Logger:  nil,
+		Storage: nil,
 	}
 }
 

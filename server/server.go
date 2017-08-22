@@ -80,9 +80,9 @@ type Config struct {
 func DefaultConfig() Config {
 	return Config{
 		// Dependencies.
-		Logger:               nil, // Required.
+		Logger:               nil,
 		Router:               mux.NewRouter(),
-		TransactionResponder: nil, // Required.
+		TransactionResponder: nil,
 
 		// Settings.
 		Endpoints:      nil,

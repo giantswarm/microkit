@@ -22,8 +22,8 @@ type ResponderConfig struct {
 func DefaultResponderConfig() ResponderConfig {
 	return ResponderConfig{
 		// Dependencies.
-		Logger:  nil, // Required.
-		Storage: nil, // Required.
+		Logger:  nil,
+		Storage: nil,
 	}
 }
 
