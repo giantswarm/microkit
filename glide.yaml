@@ -1,5 +1,11 @@
 package: github.com/giantswarm/microkit
 import:
+- package: github.com/giantswarm/microerror
+  version: master
+- package: github.com/giantswarm/micrologger
+  version: master
+- package: github.com/giantswarm/microstorage
+  version: master
 - package: github.com/go-kit/kit
   version: v0.5.0
 - package: github.com/gorilla/mux
@@ -14,12 +20,3 @@ import:
   version: master
 - package: github.com/tylerb/graceful
   version: ~1.2.13
-- package: golang.org/x/net
-- package: github.com/go-stack/stack
-  version: ~1.5.2
-- package: github.com/coreos/etcd
-  version: 3.2.1
-- package: golang.org/x/text
-  version: 4ee4af566555f5fbe026368b75596286a312663a
-- package: github.com/giantswarm/micrologger
-  version: master
