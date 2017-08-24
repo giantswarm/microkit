@@ -1,5 +1,5 @@
-hash: 3c8b1472b24a073bf42f6aa06cb3af5606d8f6d766e2e62f71260887b8d46de3
-updated: 2017-08-22T17:05:41.540455952+02:00
+hash: a820ff2e57789c17b156cd9a56701ee8e78a0aa417c3d37fde0a9396ed099f6e
+updated: 2017-08-24T14:29:05.903499336+01:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -11,8 +11,13 @@ imports:
   version: 5ade94eb4ee35ef72eb9382228470caeddb29989
 - name: github.com/giantswarm/micrologger
   version: 8a69b2ab80ba2d0bd40d609206518fefacfc8fdf
+  subpackages:
+  - microloggertest
 - name: github.com/giantswarm/microstorage
   version: f5c68d40459f0021cf8266501b7d8615ea4ff641
+  subpackages:
+  - memory
+  - microstoragetest
 - name: github.com/go-kit/kit
   version: a9ca6725cbbea455e61c6bc8a1ed28e81eb3493b
   subpackages:
@@ -24,7 +29,7 @@ imports:
 - name: github.com/go-stack/stack
   version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
 - name: github.com/golang/protobuf
-  version: 8616e8ee5e20a1704615e6c8d7afcdac06087a67
+  version: 4bd1920723d7b7c925de087aa32e2187708897f7
   subpackages:
   - proto
 - name: github.com/gorilla/context
@@ -59,7 +64,7 @@ imports:
 - name: github.com/pelletier/go-toml
   version: 4692b8f9babfc93db58cc592ba2689d8736781de
 - name: github.com/prometheus/client_golang
-  version: c5b7fccd204277076155f10851dad72b76a49317
+  version: 94ff84a9a6ebb5e6eb9172897c221a64df3443bc
   subpackages:
   - prometheus
   - prometheus/promhttp
@@ -84,7 +89,7 @@ imports:
 - name: github.com/spf13/cast
   version: acbeb36b902d72a7a4c18e8f3241075e7ab763e4
 - name: github.com/spf13/cobra
-  version: 4a7b7e65864c064d48dce82efbbfed2bdc0bf2aa
+  version: 2df9a531813370438a4d79bfc33e21f58063ed87
 - name: github.com/spf13/jwalterweatherman
   version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
@@ -94,11 +99,11 @@ imports:
 - name: github.com/tylerb/graceful
   version: 4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb
 - name: golang.org/x/sys
-  version: 8f0908ab3b2457e2e15403d3697c9ef5cb4b57a9
+  version: e48874b42435b4347fc52bdee0424a52abc974d7
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: 4ee4af566555f5fbe026368b75596286a312663a
+  version: 2910a502d2bf9e43193af9d68ca516529614eed3
   subpackages:
   - transform
   - unicode/norm
