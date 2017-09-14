@@ -1,5 +1,5 @@
-hash: a820ff2e57789c17b156cd9a56701ee8e78a0aa417c3d37fde0a9396ed099f6e
-updated: 2017-09-14T15:43:49.269843349+02:00
+hash: 2e168d238cf1c55af016d57aee0e470a52421c0ecd035a1368a36a3dc54dec0f
+updated: 2017-09-14T15:49:53.212522287+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -14,7 +14,7 @@ imports:
   subpackages:
   - microloggertest
 - name: github.com/giantswarm/microstorage
-  version: f5c68d40459f0021cf8266501b7d8615ea4ff641
+  version: e990a46ff7c9065f8d83c0a649cb1a6ef5d411d7
   subpackages:
   - memory
   - microstoragetest
