@@ -17,6 +17,7 @@ import (
 	kitendpoint "github.com/go-kit/kit/endpoint"
 	kithttp "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/viper"
 	"github.com/tylerb/graceful"
@@ -220,23 +221,21 @@ func (s *server) Boot() {
 					}
 
 					// Here we define the metrics labels. These will be used to instrument
-					// the current request. This defered callback is initialized with the
-					// timestamp of the beginning of the execution and will be executed at
-					// the very end of the request. When it is executed we know all
-					// necessary information to instrument the complete request, including
-					// its response status code.
-					defer func(t time.Time) {
+					// the current request. We also start the metrics timer.
+					endpointMethod := strings.ToLower(e.Method())
+					endpointName := strings.Replace(e.Name(), "/", "_", -1)
+
+					timer := prometheus.NewTimer(endpointTime.WithLabelValues(endpointMethod, endpointName))
+					defer timer.ObserveDuration()
+
+					defer func() {
 						endpointCode := strconv.Itoa(responseWriter.StatusCode())
-						endpointMethod := strings.ToLower(e.Method())
-						endpointName := strings.Replace(e.Name(), "/", "_", -1)
-
-						s.logger.Log("code", endpointCode, "endpoint", e.Name(), "method", endpointMethod, "path", r.URL.Path)
-
 						endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
-						endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
-					}(time.Now())
+					}()
 
-					// Wrapp the custom implementations of the endpoint specific business
+					s.logger.Log("code", endpointCode, "endpoint", e.Name(), "method", endpointMethod, "path", r.URL.Path)
+
+					// Wrap the custom implementations of the endpoint specific business
 					// logic.
 					wrappedDecoder := s.newDecoderWrapper(e, responseWriter)
 					wrappedEndpoint := s.newEndpointWrapper(e)
@@ -368,11 +367,6 @@ func (s *server) newErrorEncoderWrapper() kithttp.ErrorEncoder {
 		// Log the error and its errgo trace. This is really useful for debugging.
 		s.logger.Log("error", serverError.Error(), "trace", errorTrace(serverError))
 
-		// Emit metrics about the occured errors. That way we can feed our
-		// instrumentation stack to have nice dashboards to get a picture about the
-		// general system health.
-		errorTotal.WithLabelValues().Inc()
-
 		// Write the actual response body in case no response was already written
 		// inside the error encoder.
 		if !rw.HasWritten() {
@@ -502,21 +496,20 @@ func (s *server) newEndpointWrapper(e Endpoint) kitendpoint.Endpoint {
 // response.
 func (s *server) newNotFoundHandler() http.Handler {
 	return http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		endpointMethod := strings.ToLower(r.Method)
+		endpointName := "notfound"
+
+		timer := prometheus.NewTimer(endpointTime.WithLabelValues(endpointMethod, endpointName))
+		defer timer.ObserveDuration()
+
+		defer func() {
+			endpointCode := strconv.Itoa(http.StatusNotFound)
+			endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
+		}()
+
 		// Log the error and its message. This is really useful for debugging.
 		errMessage := fmt.Sprintf("not found: %s %s", r.Method, r.URL.Path)
 		s.logger.Log("error", errMessage, "trace", "")
-
-		// This defered callback will be executed at the very end of the request.
-		defer func(t time.Time) {
-			endpointCode := strconv.Itoa(http.StatusNotFound)
-			endpointMethod := strings.ToLower(r.Method)
-			endpointName := "notfound"
-
-			endpointTotal.WithLabelValues(endpointCode, endpointMethod, endpointName).Inc()
-			endpointTime.WithLabelValues(endpointCode, endpointMethod, endpointName).Set(float64(time.Since(t) / time.Millisecond))
-
-			errorTotal.WithLabelValues().Inc()
-		}(time.Now())
 
 		// Write the actual response body.
 		w.WriteHeader(http.StatusNotFound)
