@@ -172,7 +172,6 @@ func New(config Config) (Server, error) {
 		},
 	}
 
-
 	return newServer, nil
 }
 
@@ -290,7 +289,6 @@ func (s *server) Boot() {
 			Server: &http.Server{
 				Addr:    s.listenURL.Host,
 				Handler: s.router,
-
 			},
 			Timeout: 3 * time.Second,
 		}
