@@ -124,6 +124,9 @@ func New(config Config) (Server, error) {
 	if config.HandlerWrapper == nil {
 		return nil, microerror.Maskf(invalidConfigError, "handler wrapper must not be empty")
 	}
+	if config.ListenAddress == "" {
+		return nil, microerror.Maskf(invalidConfigError, "listen address must not be empty")
+	}
 	if config.RequestFuncs == nil {
 		return nil, microerror.Maskf(invalidConfigError, "request funcs must not be empty")
 	}
