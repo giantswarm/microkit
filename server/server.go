@@ -90,7 +90,7 @@ func DefaultConfig() Config {
 		Endpoints:      nil,
 		ErrorEncoder:   func(ctx context.Context, serverError error, w http.ResponseWriter) {},
 		HandlerWrapper: func(h http.Handler) http.Handler { return h },
-		ListenAddress:  "http://127.0.0.1:8000",
+		ListenAddress:  "",
 		LogAccess:      false,
 		RequestFuncs:   []kithttp.RequestFunc{},
 		ServiceName:    "microkit",
@@ -171,6 +171,7 @@ func New(config Config) (Server, error) {
 			Key:     config.TLSKeyFile,
 		},
 	}
+
 
 	return newServer, nil
 }
@@ -289,6 +290,7 @@ func (s *server) Boot() {
 			Server: &http.Server{
 				Addr:    s.listenURL.Host,
 				Handler: s.router,
+
 			},
 			Timeout: 3 * time.Second,
 		}
