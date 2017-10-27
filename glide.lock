@@ -1,5 +1,5 @@
 hash: 2e168d238cf1c55af016d57aee0e470a52421c0ecd035a1368a36a3dc54dec0f
-updated: 2017-09-14T15:49:53.212522287+02:00
+updated: 2017-09-15T10:57:29.324114452+02:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -37,7 +37,7 @@ imports:
 - name: github.com/gorilla/mux
   version: 0eeaf8392f5b04950925b8a69fe70f110fa7cbfc
 - name: github.com/hashicorp/hcl
-  version: 8f6b1344a92ff8877cf24a5de9177bf7d0a2a187
+  version: 68e816d1c783414e79bc65b3994d9ab6b0a722ab
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -108,5 +108,5 @@ imports:
   - transform
   - unicode/norm
 - name: gopkg.in/yaml.v2
-  version: 53feefa2559fb8dfa8d81baad31be332c97d6c77
+  version: eb3733d160e74a9c7e442f435eb3bea458e1d19f
 testImports: []

@@ -9,6 +9,9 @@ import (
 
 type ServerFactory func(v *viper.Viper) server.Server
 
+// ServerFactoryError returns a server on success and a describing error on failure
+type ServerFactoryError func(v *viper.Viper) (server.Server, error)
+
 // Command represents the daemon command for any microservice.
 type Command interface {
 	// CobraCommand returns the actual cobra command for the daemon command.
