@@ -22,18 +22,30 @@
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/micrologger"
-  packages = [".","loggermeta","microloggertest"]
+  packages = [
+    ".",
+    "loggermeta",
+    "microloggertest"
+  ]
   revision = "216e9191d90f55723bfc0e93801af96e6b80eb12"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/microstorage"
-  packages = [".","memory","microstoragetest"]
+  packages = [
+    ".",
+    "memory",
+    "microstoragetest"
+  ]
   revision = "7f39386c3f39a6b493f1dc38a405d99277c15b83"
 
 [[projects]]
   name = "github.com/go-kit/kit"
-  packages = ["endpoint","log","transport/http"]
+  packages = [
+    "endpoint",
+    "log",
+    "transport/http"
+  ]
   revision = "4dc7be5d2d12881735283bcab7352178e190fc71"
   version = "v0.6.0"
 
@@ -70,7 +82,17 @@
 [[projects]]
   branch = "master"
   name = "github.com/hashicorp/hcl"
-  packages = [".","hcl/ast","hcl/parser","hcl/scanner","hcl/strconv","hcl/token","json/parser","json/scanner","json/token"]
+  packages = [
+    ".",
+    "hcl/ast",
+    "hcl/parser",
+    "hcl/scanner",
+    "hcl/strconv",
+    "hcl/token",
+    "json/parser",
+    "json/scanner",
+    "json/token"
+  ]
   revision = "23c074d0eceb2b8a5bfdbb271ab780cde70f05a8"
 
 [[projects]]
@@ -116,10 +138,13 @@
   version = "v1.0.1"
 
 [[projects]]
+  branch = "master"
   name = "github.com/prometheus/client_golang"
-  packages = ["prometheus","prometheus/promhttp"]
-  revision = "c5b7fccd204277076155f10851dad72b76a49317"
-  version = "v0.8.0"
+  packages = [
+    "prometheus",
+    "prometheus/promhttp"
+  ]
+  revision = "f02bfc3484a6b03d1fc00d72d86add103ef9567b"
 
 [[projects]]
   branch = "master"
@@ -130,18 +155,28 @@
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/common"
-  packages = ["expfmt","internal/bitbucket.org/ww/goautoneg","model"]
+  packages = [
+    "expfmt",
+    "internal/bitbucket.org/ww/goautoneg",
+    "model"
+  ]
   revision = "89604d197083d4781071d3c65855d24ecfb0a563"
 
 [[projects]]
   branch = "master"
   name = "github.com/prometheus/procfs"
-  packages = [".","xfs"]
+  packages = [
+    ".",
+    "xfs"
+  ]
   revision = "b15cd069a83443be3154b719d0cc9fe8117f09fb"
 
 [[projects]]
   name = "github.com/spf13/afero"
-  packages = [".","mem"]
+  packages = [
+    ".",
+    "mem"
+  ]
   revision = "ec3a3111d1e1bdff38a61e09d5a5f5e974905611"
   version = "v1.0.1"
 
@@ -190,7 +225,14 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
-  packages = ["internal/gen","internal/triegen","internal/ucd","transform","unicode/cldr","unicode/norm"]
+  packages = [
+    "internal/gen",
+    "internal/triegen",
+    "internal/ucd",
+    "transform",
+    "unicode/cldr",
+    "unicode/norm"
+  ]
   revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [[projects]]
@@ -202,6 +244,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bbd831031d44bc93226f4aba19394e1c0ab4a4845b9a8c817236fee383154efd"
+  inputs-digest = "88a84e78956dbb223fa7d1f819b7d406159e1743fa1fa7307c0cc5cf35955d80"
   solver-name = "gps-cdcl"
   solver-version = 1
