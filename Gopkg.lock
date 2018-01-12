@@ -17,13 +17,13 @@
   branch = "master"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
-  revision = "ec5f66bb657662031c0d651504fee6908cdf28d9"
+  revision = "325932fa68e70dd4464598f11e2f710ac1aaec46"
 
 [[projects]]
   branch = "master"
   name = "github.com/giantswarm/micrologger"
   packages = [".","loggermeta","microloggertest"]
-  revision = "0278d149b128aef1b27d492702c0020f4ff7a717"
+  revision = "216e9191d90f55723bfc0e93801af96e6b80eb12"
 
 [[projects]]
   branch = "master"
@@ -202,6 +202,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "3bcb0f52020172da7af209320c930e5848eae0626384abebcaf2783aa6f40af9"
+  inputs-digest = "bbd831031d44bc93226f4aba19394e1c0ab4a4845b9a8c817236fee383154efd"
   solver-name = "gps-cdcl"
   solver-version = 1
