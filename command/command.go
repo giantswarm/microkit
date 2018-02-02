@@ -18,11 +18,13 @@ type Config struct {
 	ServerFactory daemon.ServerFactory
 
 	// Settings.
-	Description string
-	GitCommit   string
-	Name        string
-	Source      string
-	Viper       *viper.Viper
+	Description   string
+	GitCommit     string
+	Name          string
+	Source        string
+	WIPVersion    string
+	ActiveVersion string
+	Viper         *viper.Viper
 }
 
 // DefaultConfig provides a default configuration to create a new root command
@@ -34,11 +36,13 @@ func DefaultConfig() Config {
 		ServerFactory: nil,
 
 		// Settings.
-		Description: "",
-		GitCommit:   "",
-		Name:        "",
-		Source:      "",
-		Viper:       viper.New(),
+		Description:   "",
+		GitCommit:     "",
+		Name:          "",
+		Source:        "",
+		WIPVersion:    "",
+		ActiveVersion: "",
+		Viper:         viper.New(),
 	}
 }
 
@@ -68,6 +72,8 @@ func New(config Config) (Command, error) {
 		versionConfig.GitCommit = config.GitCommit
 		versionConfig.Name = config.Name
 		versionConfig.Source = config.Source
+		versionConfig.WIPVersion = config.WIPVersion
+		versionConfig.ActiveVersion = config.ActiveVersion
 
 		versionCommand, err = version.New(versionConfig)
 		if err != nil {
