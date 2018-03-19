@@ -12,7 +12,6 @@ import (
 )
 
 type Config struct {
-	// Settings.
 	Description    string
 	GitCommit      string
 	Name           string
@@ -21,7 +20,6 @@ type Config struct {
 }
 
 func New(config Config) (Command, error) {
-	// Settings.
 	if config.Description == "" {
 		return nil, microerror.Maskf(invalidConfigError, "description commit must not be empty")
 	}
@@ -36,10 +34,8 @@ func New(config Config) (Command, error) {
 	}
 
 	newCommand := &command{
-		// Internals.
 		cobraCommand: nil,
 
-		// Settings.
 		Description:    config.Description,
 		GitCommit:      config.GitCommit,
 		Name:           config.Name,

@@ -14,11 +14,9 @@ import (
 
 // Config represents the configuration used to create a new root command.
 type Config struct {
-	// Dependencies.
 	Logger        micrologger.Logger
 	ServerFactory daemon.ServerFactory
 
-	// Settings.
 	Description    string
 	GitCommit      string
 	Name           string
