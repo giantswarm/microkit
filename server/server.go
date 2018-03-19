@@ -64,61 +64,41 @@ type Config struct {
 	Viper *viper.Viper
 }
 
-// DefaultConfig provides a default configuration to create a new server object
-// by best effort.
-func DefaultConfig() Config {
-	return Config{
-		Logger: nil,
-		Router: mux.NewRouter(),
-
-		Endpoints:      nil,
-		ErrorEncoder:   func(ctx context.Context, serverError error, w http.ResponseWriter) {},
-		HandlerWrapper: func(h http.Handler) http.Handler { return h },
-		ListenAddress:  "",
-		LogAccess:      false,
-		RequestFuncs:   []kithttp.RequestFunc{},
-		ServiceName:    "microkit",
-		TLSCAFile:      "",
-		TLSCrtFile:     "",
-		TLSKeyFile:     "",
-		Viper:          viper.New(),
-	}
-}
-
 // New creates a new configured server object.
 func New(config Config) (Server, error) {
-	// Dependencies.
 	if config.Logger == nil {
 		return nil, microerror.Maskf(invalidConfigError, "logger must not be empty")
 	}
 	if config.Router == nil {
-		return nil, microerror.Maskf(invalidConfigError, "router must not be empty")
+		config.Router = mux.NewRouter()
 	}
 
-	// Settings.
 	if config.Endpoints == nil {
 		return nil, microerror.Maskf(invalidConfigError, "endpoints must not be empty")
 	}
 	if config.ErrorEncoder == nil {
-		return nil, microerror.Maskf(invalidConfigError, "error encoder must not be empty")
+		config.ErrorEncoder = func(ctx context.Context, serverError error, w http.ResponseWriter) {}
 	}
 	if config.HandlerWrapper == nil {
-		return nil, microerror.Maskf(invalidConfigError, "handler wrapper must not be empty")
+		config.HandlerWrapper = func(h http.Handler) http.Handler { return h }
 	}
 	if config.ListenAddress == "" {
 		return nil, microerror.Maskf(invalidConfigError, "listen address must not be empty")
 	}
 	if config.RequestFuncs == nil {
-		return nil, microerror.Maskf(invalidConfigError, "request funcs must not be empty")
+		config.RequestFuncs = []kithttp.RequestFunc{}
 	}
 	if config.ServiceName == "" {
-		return nil, microerror.Maskf(invalidConfigError, "service name must not be empty")
+		config.ServiceName = "microkit"
 	}
 	if config.TLSCrtFile == "" && config.TLSKeyFile != "" {
 		return nil, microerror.Maskf(invalidConfigError, "TLS public key must not be empty")
 	}
 	if config.TLSCrtFile != "" && config.TLSKeyFile == "" {
 		return nil, microerror.Maskf(invalidConfigError, "TLS private key must not be empty")
+	}
+	if config.Viper == nil {
+		config.Viper = viper.New()
 	}
 
 	listenURL, err := url.Parse(config.ListenAddress)

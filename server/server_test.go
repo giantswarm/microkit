@@ -26,10 +26,11 @@ func Test_Server_Endpoints(t *testing.T) {
 	e2.(*testEndpoint).endpointResponseFormat = "e2-test-response-%d"
 	e2.(*testEndpoint).path = "/e2-test-path"
 
-	config := DefaultConfig()
-	config.Logger = microloggertest.New()
-	config.ListenAddress = "http://127.0.0.1:8000"
-	config.Endpoints = []Endpoint{e1, e2}
+	config := Config{
+		Logger:        microloggertest.New(),
+		ListenAddress: "http://127.0.0.1:8000",
+		Endpoints:     []Endpoint{e1, e2},
+	}
 	newServer, err := New(config)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
@@ -80,10 +81,11 @@ func Test_Server_Endpoints(t *testing.T) {
 func Test_Server_Default_HandlerWrapper(t *testing.T) {
 	e := testNewEndpoint(t)
 
-	config := DefaultConfig()
-	config.Logger = microloggertest.New()
-	config.ListenAddress = "http://127.0.0.1:8000"
-	config.Endpoints = []Endpoint{e}
+	config := Config{
+		Logger:        microloggertest.New(),
+		ListenAddress: "http://127.0.0.1:8000",
+		Endpoints:     []Endpoint{e},
+	}
 	newServer, err := New(config)
 	if err != nil {
 		t.Fatal("expected", nil, "got", err)
@@ -119,15 +121,16 @@ func Test_Server_Default_HandlerWrapper(t *testing.T) {
 func Test_Server_Custom_HandlerWrapper(t *testing.T) {
 	e := testNewEndpoint(t)
 
-	config := DefaultConfig()
-	config.Logger = microloggertest.New()
-	config.ListenAddress = "http://127.0.0.1:8000"
-	config.Endpoints = []Endpoint{e}
-	config.HandlerWrapper = func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("X-Test-Header", "test value")
-			h.ServeHTTP(w, r)
-		})
+	config := Config{
+		Logger:        microloggertest.New(),
+		ListenAddress: "http://127.0.0.1:8000",
+		Endpoints:     []Endpoint{e},
+		HandlerWrapper: func(h http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("X-Test-Header", "test value")
+				h.ServeHTTP(w, r)
+			})
+		},
 	}
 	newServer, err := New(config)
 	if err != nil {
