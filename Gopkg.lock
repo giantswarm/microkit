@@ -39,7 +39,7 @@
   branch = "master"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
-  revision = "36ba466124d6494c1772e6380756594ba996d081"
+  revision = "d3bebdd7a9efb503d3ce05d6feaf9f403ccbf927"
 
 [[projects]]
   name = "github.com/go-kit/kit"
@@ -222,12 +222,6 @@
   version = "v1.0.2"
 
 [[projects]]
-  name = "github.com/tylerb/graceful"
-  packages = ["."]
-  revision = "4654dfbb6ad53cb5e27f37d99b02e16c1872fbbb"
-  version = "v1.2.15"
-
-[[projects]]
   branch = "master"
   name = "golang.org/x/net"
   packages = [
@@ -279,6 +273,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "9bdd7af7ae0539a7636f983fb542dfea9582e90ca31c949dbbbc60c817c40d1a"
+  inputs-digest = "18c5967e8ac647b35051a62781c9e122557aca1baa3955faf67079af51373832"
   solver-name = "gps-cdcl"
   solver-version = 1
