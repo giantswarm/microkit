@@ -37,6 +37,9 @@ type Bundle struct {
 	//
 	// NOTE that once this property is set it must never change again.
 	Name string `json:"name" yaml:"name"`
+	// Provider describes infrastructure provider that is specific for this
+	// Bundle.
+	Provider string `json:"provider,omitempty" yaml:"provider,omitempty"`
 	// Time describes the time this version bundle got introduced.
 	//
 	// NOTE that once this property is set it must never change again.
@@ -168,9 +171,6 @@ func (b Bundle) Validate() error {
 		}
 	}
 
-	if len(b.Components) == 0 {
-		return microerror.Maskf(invalidBundleError, "components must not be empty")
-	}
 	for _, c := range b.Components {
 		err := c.Validate()
 		if err != nil {
