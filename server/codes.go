@@ -1,6 +1,8 @@
 package server
 
 var (
+	// CodeAccountExpired indicates the login attempt failed due to an expired account.
+	CodeAccountExpired = "ACCOUNT_EXPIRED"
 	// CodeFailure indicates the requested action failed.
 	CodeFailure = "FAILURE"
 	// CodeInvalidCredentials indicates the provided credentials are not valid.
