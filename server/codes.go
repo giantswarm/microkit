@@ -24,6 +24,8 @@ var (
 	CodeResourceUpdated = "RESOURCE_UPDATED"
 	// CodeSuccess indicates the requested action successed.
 	CodeSuccess = "SUCCESS"
+	// CodeTooManyRequests indicates the client is making too many requests.
+	CodeTooManyRequests = "TOO_MANY_REQUESTS"
 	// CodeImmutableAttribute indicates the provided data structure contains
 	// fields that are immutable.
 	CodeImmutableAttribute = "IMMUTABLE_ATTRIBUTE"
