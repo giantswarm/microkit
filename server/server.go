@@ -116,13 +116,13 @@ func New(config Config) (Server, error) {
 		if err != nil {
 			return nil, microerror.Maskf(invalidConfigError, err.Error())
 		}
-	}
 
-	// Check if the user supplied a https scheme for the optional metrics endpoint
-	// listener. Let them know that tls configuration for this endpoint is not yet
-	// implemented.
-	if listenMetricsURL.Scheme == "https" {
-		return nil, microerror.Maskf(invalidConfigError, "The optional metrics listener currently does not support tls configuration. Listening on https is thus disabled.")
+		// Check if the user supplied a https scheme for the optional metrics endpoint
+		// listener. Let them know that tls configuration for this endpoint is not yet
+		// implemented.
+		if listenMetricsURL.Scheme == "https" {
+			return nil, microerror.Maskf(invalidConfigError, "The optional metrics listener currently does not support tls configuration. Listening on https is thus disabled.")
+		}
 	}
 
 	newServer := &server{
