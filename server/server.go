@@ -118,6 +118,13 @@ func New(config Config) (Server, error) {
 		}
 	}
 
+	// Check if the user supplied a https scheme for the optional metrics endpoint
+	// listener. Let them know that tls configuration for this endpoint is not yet
+	// implemented.
+	if listenMetricsURL.Scheme == "https" {
+		return nil, microerror.Maskf(invalidConfigError, "The optional metrics listener currently does not support tls configuration. Listening on https is thus disabled.")
+	}
+
 	newServer := &server{
 		errorEncoder: config.ErrorEncoder,
 		logger:       config.Logger,
@@ -258,14 +265,6 @@ func (s *server) Boot() {
 				s.metricsHTTPServer = &http.Server{
 					Addr:    s.listenMetricsUrl.Host,
 					Handler: metricsRouter,
-				}
-
-				if s.listenMetricsUrl.Scheme == "https" {
-					tlsConfig, err := tls.LoadTLSConfig(s.tlsCertFiles)
-					if err != nil {
-						panic(err)
-					}
-					s.metricsHTTPServer.TLSConfig = tlsConfig
 				}
 
 				err := s.metricsHTTPServer.ListenAndServe()
