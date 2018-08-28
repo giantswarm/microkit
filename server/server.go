@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/http/pprof"
+	_ "net/http/pprof"
 	"net/url"
 	"strconv"
 	"strings"
@@ -291,7 +291,9 @@ func (s *server) Boot() {
 		if s.enableDebugServer {
 			go func() {
 				s.logger.Log("level", "debug", "message", "running debug server at http://127.0.0.1:6060/debug")
-				s.logger.Log("level", "debug", "message", "%#v", http.ListenAndServe("127.0.0.1:6060", pprof.Handler(s.serviceName)))
+				// When net/http/pprof is imported, its init() registers /debug
+				// handles to DefaultServeMux automatically.
+				s.logger.Log("level", "debug", "message", "%#v", http.ListenAndServe("127.0.0.1:6060", nil))
 			}()
 		}
 
