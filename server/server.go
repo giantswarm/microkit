@@ -293,7 +293,7 @@ func (s *server) Boot() {
 				s.logger.Log("level", "debug", "message", "running debug server at http://127.0.0.1:6060/debug")
 				// When net/http/pprof is imported, its init() registers /debug
 				// handles to DefaultServeMux automatically.
-				s.logger.Log("level", "debug", "message", "%#v", http.ListenAndServe("127.0.0.1:6060", nil))
+				s.logger.Log("level", "debug", "message", fmt.Sprintf("%#v", http.ListenAndServe("127.0.0.1:6060", nil)))
 			}()
 		}
 
