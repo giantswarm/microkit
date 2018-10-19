@@ -204,11 +204,28 @@ func (s *server) Boot() {
 						return
 					}
 
+					// TODO: Get a good service name.
+					tracer, closer, err := tracer("microkit-server")
+					if err != nil {
+						s.newErrorEncoderWrapper()(ctx, err, w)
+						return
+					}
+					defer closer.Close()
+
+					span := tracer.StartSpan(strings.Replace(e.Name(), "/", "_", -1))
+					defer span.Finish()
+
+					span.LogKV("event", "access")
+
 					responseWriter, err := s.newResponseWriter(w)
 					if err != nil {
 						s.newErrorEncoderWrapper()(ctx, err, w)
 						return
 					}
+
+					span.SetTag("code", strconv.Itoa(responseWriter.StatusCode()))
+					span.SetTag("method", strings.ToLower(e.Method()))
+					span.SetTag("name", strings.Replace(e.Name(), "/", "_", -1))
 
 					// Here we define the metrics labels. These will be used to instrument
 					// the current request. This defered callback is initialized with the
