@@ -410,7 +410,7 @@ func (s *server) newErrorEncoderWrapper() kithttp.ErrorEncoder {
 		s.errorEncoder(ctx, responseError, rw)
 
 		// Log the error and its stack. This is really useful for debugging.
-		s.logger.LogCtx(ctx, "level", "error", "message", "stop endpoint processing due to error", "stack", fmt.Sprintf("%#v", serverError))
+		s.logger.LogCtx(ctx, "level", "error", "message", "stop endpoint processing due to error", "stack", fmt.Sprintf("%#v", microerror.Mask(serverError)))
 
 		// Emit metrics about the occured errors. That way we can feed our
 		// instrumentation stack to have nice dashboards to get a picture about the
