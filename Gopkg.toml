@@ -58,8 +58,8 @@
   name = "github.com/giantswarm/versionbundle"
 
 [[constraint]]
-  branch = "v2"
   name = "gopkg.in/yaml.v2"
+  version = "2.2.2"
 
 [prune]
   go-tests = true
