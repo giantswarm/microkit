@@ -49,6 +49,16 @@ func UnknownAttribute(received, expected map[string]interface{}) error {
 		var found bool
 
 		for e := range expected {
+			_, eIsMapStringInterface := expected[e].(map[string]interface{})
+			_, rIsMapStringInterface := received[r].(map[string]interface{})
+
+			if eIsMapStringInterface && rIsMapStringInterface {
+				err := UnknownAttribute(received[r].(map[string]interface{}), expected[e].(map[string]interface{}))
+				if err != nil {
+					return microerror.Mask(err)
+				}
+			}
+
 			if e == r {
 				found = true
 				break
