@@ -47,6 +47,44 @@ func Test_UnknownAttribute(t *testing.T) {
 			ErrorAttribute: "baz",
 			ErrorMatcher:   IsUnknownAttribute,
 		},
+		{
+			Received:       map[string]interface{}{"nested": map[string]interface{}{"attribute": "yes"}},
+			Expected:       map[string]interface{}{"nested": map[string]interface{}{"attribute": "yes"}},
+			ErrorAttribute: "",
+			ErrorMatcher:   nil,
+		},
+		{
+			Received: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"unknown_attribute": "oh no",
+				},
+			},
+			Expected: map[string]interface{}{
+				"nested": map[string]interface{}{
+					"known_attribute": "",
+				},
+			},
+			ErrorAttribute: "unknown_attribute",
+			ErrorMatcher:   IsUnknownAttribute,
+		},
+		{
+			Received: map[string]interface{}{
+				"deeply": map[string]interface{}{
+					"nested": map[string]interface{}{
+						"unknown_attribute": true,
+					},
+				},
+			},
+			Expected: map[string]interface{}{
+				"deeply": map[string]interface{}{
+					"nested": map[string]interface{}{
+						"known_attribute": "",
+					},
+				},
+			},
+			ErrorAttribute: "unknown_attribute",
+			ErrorMatcher:   IsUnknownAttribute,
+		},
 	}
 
 	for i, testCase := range testCases {
