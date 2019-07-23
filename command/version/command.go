@@ -16,7 +16,6 @@ type Config struct {
 	GitCommit      string
 	Name           string
 	Source         string
-	Version        string
 	VersionBundles []versionbundle.Bundle
 }
 
@@ -33,9 +32,6 @@ func New(config Config) (Command, error) {
 	if config.Source == "" {
 		return nil, microerror.Maskf(invalidConfigError, "source must not be empty")
 	}
-	if config.Version == "" {
-		return nil, microerror.Maskf(invalidConfigError, "%T.Version must not be empty", config)
-	}
 
 	newCommand := &command{
 		cobraCommand: nil,
@@ -47,7 +43,6 @@ func New(config Config) (Command, error) {
 		GoVersion:      runtime.Version(),
 		OS:             runtime.GOOS,
 		Arch:           runtime.GOARCH,
-		Version:        config.Version,
 		VersionBundles: config.VersionBundles,
 	}
 
@@ -71,7 +66,6 @@ type command struct {
 	GoVersion      string                 `json:"goVersion" yaml:"goVersion"`
 	OS             string                 `json:"os" yaml:"os"`
 	Arch           string                 `json:"arch" yaml:"arch"`
-	Version        string                 `json:"version" yaml:"version"`
 	VersionBundles []versionbundle.Bundle `json:"versionBundles" yaml:"versionBundles"`
 }
 
