@@ -22,16 +22,16 @@ type Config struct {
 
 func New(config Config) (Command, error) {
 	if config.Description == "" {
-		return nil, microerror.Maskf(invalidConfigError, "description commit must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Description must not be empty", config)
 	}
 	if config.GitCommit == "" {
-		return nil, microerror.Maskf(invalidConfigError, "git commit must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.GitCommit must not be empty", config)
 	}
 	if config.Name == "" {
-		return nil, microerror.Maskf(invalidConfigError, "name must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Name must not be empty", config)
 	}
 	if config.Source == "" {
-		return nil, microerror.Maskf(invalidConfigError, "source must not be empty")
+		return nil, microerror.Maskf(invalidConfigError, "%T.Source must not be empty", config)
 	}
 	if config.Version == "" {
 		return nil, microerror.Maskf(invalidConfigError, "%T.Version must not be empty", config)
