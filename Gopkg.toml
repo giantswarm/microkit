@@ -21,11 +21,11 @@
 #  version = "2.4.0"
 
 
-[[constraint]]
-  branch = "master"
+[[override]]
   name = "github.com/giantswarm/microerror"
+  version = "=0.1.0"
 
-[[constraint]]
+[[override]]
   name = "github.com/giantswarm/micrologger"
   version = "v0.1.0"
 
