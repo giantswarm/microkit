@@ -26,15 +26,15 @@
   version = "v1.4.7"
 
 [[projects]]
-  branch = "master"
-  digest = "1:79f54a2f18a165a7f4310ff5ec6ae87e5352e31a5ac2b0e84e8913ba22cfa841"
+  digest = "1:701a5f5a7297ced0c7b9aeeba6a40ef47663b956d56e7acd09fe0d1c31eb1e4b"
   name = "github.com/giantswarm/microerror"
   packages = ["."]
   pruneopts = "UT"
-  revision = "dc32fd459f94c7f9f938366135f6a19b3f9c63a9"
+  revision = "e8fe0fa9c0097ca80d8b773e1d728843447f9233"
+  version = "v0.1.0"
 
 [[projects]]
-  digest = "1:c497795cf3848ef5a655d53f24dfc670c72f9b2fc41eeda495d66542ae6bd017"
+  digest = "1:4e616fe01d486048e77342e2c5e638f8744ec6da802335633740aafb057f50d8"
   name = "github.com/giantswarm/micrologger"
   packages = [
     ".",
@@ -42,16 +42,16 @@
     "microloggertest",
   ]
   pruneopts = "UT"
-  revision = "c87486c7d20d7878ad57a09d379d7d59328b472e"
-  version = "v0.1.0"
+  revision = "c4d217562e3d493e3ff571707346a5a2653475cb"
+  version = "v0.1.1"
 
 [[projects]]
   branch = "master"
-  digest = "1:e6227e79e59fea0321b7206823740cdebfd813ad52b5afec79c836385f91480a"
+  digest = "1:3ae20d2628fa4e9bffc3ed9e9f4d4886d7c219a9361f823a00149974eee24571"
   name = "github.com/giantswarm/versionbundle"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c6a9f18d7762cb6bcc244b6d78adfa1d1eb179f0"
+  revision = "7cd29f92bcce560bb124a4a496998777c52a9056"
 
 [[projects]]
   digest = "1:83a37f3bd4ccd13469775ef771e943e6c7cfaba6926decff6c83135e56512f08"
