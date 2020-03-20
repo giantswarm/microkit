@@ -7,15 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Updated
-
-- Use released versions of Giant Swarm libraries.
-
-## [0.1.0] 2020-02-13
+## [0.1.0] 2020-03-16
 
 ### Added
 
 - First release.
 
-[Unreleased]: https://github.com/giantswarm/microkit/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/giantswarm/microkit/releases/tag/v0.1.0
+[Unreleased]: https://github.com/giantswarm/versionbundle/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/giantswarm/versionbundle/releases/tag/v0.1.0

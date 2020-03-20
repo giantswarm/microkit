@@ -21,13 +21,17 @@
 #  version = "2.4.0"
 
 
-[[override]]
+[[constraint]]
   name = "github.com/giantswarm/microerror"
-  version = "=v0.1.0"
+  version = "~0.1.0"
 
-[[override]]
+[[constraint]]
   name = "github.com/giantswarm/micrologger"
-  version = "=v0.1.0"
+  version = "~0.1.0"
+
+[[constraint]]
+  name = "github.com/giantswarm/versionbundle"
+  version = "~0.1.0"
 
 [[constraint]]
   name = "github.com/go-kit/kit"
@@ -52,10 +56,6 @@
 [[constraint]]
   name = "github.com/spf13/viper"
   version = "1.0.0"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/giantswarm/versionbundle"
 
 [[constraint]]
   name = "gopkg.in/yaml.v2"
