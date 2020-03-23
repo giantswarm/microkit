@@ -8,12 +8,13 @@ import (
 	"syscall"
 
 	"github.com/giantswarm/microerror"
-	"github.com/giantswarm/microkit/command/daemon/flag"
-	microflag "github.com/giantswarm/microkit/flag"
-	"github.com/giantswarm/microkit/server"
 	"github.com/giantswarm/micrologger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/giantswarm/microkit/command/daemon/flag"
+	microflag "github.com/giantswarm/microkit/flag"
+	"github.com/giantswarm/microkit/server"
 )
 
 var (
