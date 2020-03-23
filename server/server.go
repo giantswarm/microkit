@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/micrologger"
 	kitendpoint "github.com/go-kit/kit/endpoint"
 	kithttp "github.com/go-kit/kit/transport/http"
@@ -21,7 +22,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/viper"
 
-	"github.com/giantswarm/microerror"
 	"github.com/giantswarm/microkit/tls"
 )
 
