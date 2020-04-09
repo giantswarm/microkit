@@ -9,6 +9,9 @@ var (
 	CodeInvalidCredentials = "INVALID_CREDENTIALS"
 	// CodeNotSupported indicates that the resource is not supported.
 	CodeNotSupported = "NOT_SUPPORTED"
+	// CodeNotYetAvailable indicates that the API operation used is not ready yet.
+	// Should occur with HTTP status code 503.
+	CodeNotYetAvailable = "NOT_YET_AVAILABLE"
 	// CodePermissionDenied indicates the provided credentials are valid, but the
 	// requested resource requires other permissions.
 	CodePermissionDenied = "PERMISSION_DENIED"
@@ -34,8 +37,8 @@ var (
 	// CodeUnknownAttribute indicates the provided data structure contains
 	// unexpected fields.
 	CodeUnknownAttribute = "UNKNOWN_ATTRIBUTE"
-	// CodeInvalidInput indicates the user provided some input that does not validate
-	// (usually HTTP status 400).
+	// CodeInvalidInput indicates the user provided some input that does not
+	// validate (usually HTTP status 400).
 	CodeInvalidInput = "INVALID_INPUT"
 	// CodeInternalError represents an error we don't want to give more details
 	// about (usually HTTP status 500).
