@@ -14,3 +14,5 @@ require (
 	github.com/spf13/viper v1.7.1
 	gopkg.in/yaml.v2 v2.3.0
 )
+
+replace github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.3
