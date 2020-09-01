@@ -1,6 +1,6 @@
 module github.com/giantswarm/microkit
 
-go 1.13
+go 1.14
 
 require (
 	github.com/giantswarm/microerror v0.2.0
@@ -15,4 +15,5 @@ require (
 	gopkg.in/yaml.v2 v2.3.0
 )
 
+// Apply fix for CVE-2020-15114 not yet released in github.com/spf13/viper.
 replace github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.3
