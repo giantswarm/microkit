@@ -107,7 +107,7 @@ func Test_Server_Default_HandlerWrapper(t *testing.T) {
 			t.Fatal("expected", http.StatusOK, "got", w.Code)
 		}
 
-		h := w.HeaderMap.Get("X-Test-Header")
+		h := w.Result().Header.Get("X-Test-Header")
 		if h != "" {
 			t.Fatal("expected", "no header", "got", h)
 		}
@@ -153,7 +153,7 @@ func Test_Server_Custom_HandlerWrapper(t *testing.T) {
 			t.Fatal("expected", http.StatusOK, "got", w.Code)
 		}
 
-		h := w.HeaderMap.Get("X-Test-Header")
+		h := w.Result().Header.Get("X-Test-Header")
 		if h != "test value" {
 			t.Fatal("expected", "no header", "got", h)
 		}
