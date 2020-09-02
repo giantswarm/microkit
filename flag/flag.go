@@ -35,7 +35,10 @@ func Init(f interface{}) {
 }
 
 func Parse(v *viper.Viper, fs *pflag.FlagSet) {
-	v.BindPFlags(fs)
+	err := v.BindPFlags(fs)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func Merge(v *viper.Viper, fs *pflag.FlagSet, dirs, files []string) error {
@@ -53,7 +56,7 @@ func Merge(v *viper.Viper, fs *pflag.FlagSet, dirs, files []string) error {
 
 		err := newViper.ReadInConfig()
 		if err != nil {
-			if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			if _, ok := err.(viper.ConfigFileNotFoundError); ok { //nolint:gosimple
 				// In case there is no config file given we simply go ahead to check
 				// the other ones. If we do not find any configuration using config
 				// files, we go ahead to check the process environment.
