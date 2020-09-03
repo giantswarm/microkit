@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.2.2] - 2020-09-02
 
-### Changed
+### Security
 
 - Update Go modules including security fix for github.com/bketelsen/crypt.
 
