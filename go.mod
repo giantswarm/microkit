@@ -15,6 +15,3 @@ require (
 	golang.org/x/sys v0.0.0-20211214170744-3b038e5940ed // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
-
-// Apply fix for CVE-2020-15114 not yet released in github.com/spf13/viper.
-replace github.com/bketelsen/crypt => github.com/bketelsen/crypt v0.0.3
