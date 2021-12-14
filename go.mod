@@ -1,6 +1,6 @@
 module github.com/giantswarm/microkit
 
-go 1.14
+go 1.17
 
 require (
 	github.com/giantswarm/microerror v0.4.0
