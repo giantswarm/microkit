@@ -12,6 +12,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade to Go 1.17
+- Upgrade github.com/go-kit/kit v0.10.0 to v0.12.0
+- Upgrade github.com/giantswarm/microerror v0.2.0 to v0.4.0
+- Upgrade github.com/giantswarm/micrologger v0.3.1 to v0.6.0
+- Upgrade github.com/giantswarm/versionbundle v0.2.0 to v0.3.0
+- Upgrade github.com/spf13/viper v1.7.1 to v1.10.0
+- Update github.com/spf13/cobra v1.0.0 to v1.3.0
+- Upgrade giantswarm/architect 0.11.0 to 4.8.1
+- Remove github.com/bketelsen/crypt
 
 ## [0.2.2] - 2020-09-02
 
