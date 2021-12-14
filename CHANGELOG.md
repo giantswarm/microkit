@@ -9,19 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.0] - 2021-12-14
-
 ### Changed
 
 - Upgrade to Go 1.17
 - Upgrade github.com/go-kit/kit v0.10.0 to v0.12.0
 - Upgrade github.com/giantswarm/microerror v0.2.0 to v0.4.0
 - Upgrade github.com/giantswarm/micrologger v0.3.1 to v0.6.0
-- Upgrade github.com/giantswarm/versionbundle v0.2.0 to v0.3.0
+- Upgrade github.com/giantswarm/versionbundle v0.2.0 to v1.0.0
 - Upgrade github.com/spf13/viper v1.7.1 to v1.10.0
 - Update github.com/spf13/cobra v1.0.0 to v1.3.0
 - Upgrade giantswarm/architect 0.11.0 to 4.8.1
-- Remove github.com/bketelsen/crypt
+- Remove github.com/bketelsen/crypt replacement
 
 ## [0.2.2] - 2020-09-02
 
@@ -62,8 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
-[Unreleased]: https://github.com/giantswarm/microkit/compare/v0.3.0...HEAD
-[0.3.0]: https://github.com/giantswarm/microkit/compare/v0.2.2...v0.3.0
+[Unreleased]: https://github.com/giantswarm/microkit/compare/v0.2.2...HEAD
 [0.2.2]: https://github.com/giantswarm/microkit/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/giantswarm/microkit/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/giantswarm/microkit/compare/v0.1.1...v0.2.0
