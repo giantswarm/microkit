@@ -11,7 +11,8 @@ require (
 	github.com/prometheus/client_golang v1.11.0
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.7.1
+	github.com/spf13/viper v1.10.0
+	golang.org/x/sys v0.0.0-20211214170744-3b038e5940ed // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )
 
