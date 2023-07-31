@@ -1,6 +1,7 @@
-[![CircleCI](https://circleci.com/gh/giantswarm/microkit.svg?&style=shield&circle-token=4f9bcb6c87ba74df83da96c9ad004b489039e789)](https://circleci.com/gh/giantswarm/microkit)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/giantswarm/microkit/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/giantswarm/microkit/tree/master)
 
 # microkit
+
 The microkit package implements an opinionated microservice framework which can
 be used as library in golang microservices to speed up development. See the
 example microservice using the microkit package:
