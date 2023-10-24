@@ -40,7 +40,7 @@ func Test_Server_Endpoints(t *testing.T) {
 	defer newServer.Shutdown()
 
 	{
-		r, err := http.NewRequest("GET", "/e1-test-path", nil)
+		r, err := http.NewRequest(http.MethodGet, "/e1-test-path", nil)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
@@ -58,7 +58,7 @@ func Test_Server_Endpoints(t *testing.T) {
 	}
 
 	{
-		r, err := http.NewRequest("GET", "/e2-test-path", nil)
+		r, err := http.NewRequest(http.MethodGet, "/e2-test-path", nil)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
@@ -95,7 +95,7 @@ func Test_Server_Default_HandlerWrapper(t *testing.T) {
 	defer newServer.Shutdown()
 
 	{
-		r, err := http.NewRequest("GET", "/test-path", nil)
+		r, err := http.NewRequest(http.MethodGet, "/test-path", nil)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}
@@ -141,7 +141,7 @@ func Test_Server_Custom_HandlerWrapper(t *testing.T) {
 	defer newServer.Shutdown()
 
 	{
-		r, err := http.NewRequest("GET", "/test-path", nil)
+		r, err := http.NewRequest(http.MethodGet, "/test-path", nil)
 		if err != nil {
 			t.Fatal("expected", nil, "got", err)
 		}

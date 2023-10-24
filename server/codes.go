@@ -6,6 +6,7 @@ var (
 	// CodeFailure indicates the requested action failed.
 	CodeFailure = "FAILURE"
 	// CodeInvalidCredentials indicates the provided credentials are not valid.
+	//nolint:gosec
 	CodeInvalidCredentials = "INVALID_CREDENTIALS"
 	// CodeNotSupported indicates that the resource is not supported.
 	CodeNotSupported = "NOT_SUPPORTED"

@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"io/ioutil"
+	"os"
 
 	"github.com/giantswarm/microerror"
 )
@@ -31,12 +32,12 @@ func LoadTLSConfig(files CertFiles) (*tls.Config, error) {
 
 	var certificate tls.Certificate
 	if loadCert {
-		cert, err := ioutil.ReadFile(files.Cert)
+		cert, err := os.ReadFile(files.Cert)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
 
-		key, err := ioutil.ReadFile(files.Key)
+		key, err := os.ReadFile(files.Key)
 		if err != nil {
 			return nil, microerror.Mask(err)
 		}
