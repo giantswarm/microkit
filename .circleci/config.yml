@@ -8,6 +8,7 @@ workflows:
     jobs:
       - architect/go-test:
           name: go-test
+          context: architect
           filters:
             # Trigger job also on git tag.
             tags:
