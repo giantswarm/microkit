@@ -1,4 +1,5 @@
 # pkg:golang/github.com/hashicorp/consul/api
+# pkg:golang/github.com/hashicorp/consul/sdk
 CVE-2022-29153
 CVE-2021-41803
 CVE-2022-24687
