@@ -46,4 +46,7 @@ require (
 	gopkg.in/resty.v1 v1.12.0 // indirect
 )
 
-replace github.com/hashicorp/consul/api => github.com/hashicorp/consul/api v1.25.1
+replace (
+	github.com/hashicorp/consul/api => github.com/hashicorp/consul/api v1.25.1
+	github.com/hashicorp/consul/sdk => github.com/hashicorp/consul/sdk v0.14.1
+)
