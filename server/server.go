@@ -270,8 +270,12 @@ func (s *server) Boot() {
 				metricsRouter.Path("/metrics").Handler(promhttp.Handler())
 
 				s.metricsHTTPServer = &http.Server{
-					Addr:    s.listenMetricsUrl.Host,
-					Handler: metricsRouter,
+					Addr:              s.listenMetricsUrl.Host,
+					Handler:           metricsRouter,
+					IdleTimeout:       120 * time.Second,
+					ReadHeaderTimeout: 60 * time.Second,
+					ReadTimeout:       60 * time.Second,
+					WriteTimeout:      60 * time.Second,
 				}
 
 				err := s.metricsHTTPServer.ListenAndServe()
@@ -293,6 +297,7 @@ func (s *server) Boot() {
 				s.logger.Log("level", "debug", "message", "running debug server at http://127.0.0.1:6060/debug")
 				// When net/http/pprof is imported, its init() registers /debug
 				// handles to DefaultServeMux automatically.
+				//nolint:gosec
 				s.logger.Log("level", "debug", "message", fmt.Sprintf("%#v", http.ListenAndServe("127.0.0.1:6060", nil)))
 			}()
 		}
@@ -300,8 +305,12 @@ func (s *server) Boot() {
 		// Register the router which has all of the configured custom endpoints
 		// registered.
 		s.httpServer = &http.Server{
-			Addr:    s.listenURL.Host,
-			Handler: s.router,
+			Addr:              s.listenURL.Host,
+			Handler:           s.router,
+			IdleTimeout:       120 * time.Second,
+			ReadHeaderTimeout: 60 * time.Second,
+			ReadTimeout:       60 * time.Second,
+			WriteTimeout:      60 * time.Second,
 		}
 
 		go func() {
