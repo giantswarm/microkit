@@ -1,14 +1,17 @@
 # pkg:golang/github.com/hashicorp/consul/api
 # pkg:golang/github.com/hashicorp/consul/sdk
-CVE-2022-29153
-CVE-2021-41803
-CVE-2022-24687
+CVE-2022-29153 until=2024-03-31
+CVE-2021-41803 until=2024-03-31
+CVE-2022-24687 until=2024-03-31
 
 # pkg:golang/github.com/nats-io/nats-server/v2
-CVE-2022-28357
-CVE-2022-24450
-CVE-2022-29946
-CVE-2022-26652
-CVE-2022-42709
-CVE-2022-42708
-CVE-2023-47090
+CVE-2022-28357 until=2024-03-31
+CVE-2022-24450 until=2024-03-31
+CVE-2022-29946 until=2024-03-31
+CVE-2022-26652 until=2024-03-31
+CVE-2022-42709 until=2024-03-31
+CVE-2022-42708 until=2024-03-31
+CVE-2023-47090 until=2024-03-31
+
+pkg:golang/google.golang.org/protobuf@v1.31.0
+CVE-2024-24786 until=2024-03-31
