@@ -47,7 +47,7 @@ require (
 )
 
 replace (
-	github.com/hashicorp/consul/api => github.com/hashicorp/consul/api v1.25.1
+	github.com/hashicorp/consul/api => github.com/hashicorp/consul/api v1.28.2
 	github.com/hashicorp/consul/sdk => github.com/hashicorp/consul/sdk v0.14.1
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.17.0
 	golang.org/x/crypto => golang.org/x/crypto v0.19.0
