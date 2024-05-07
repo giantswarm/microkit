@@ -54,6 +54,6 @@ replace (
 	github.com/hashicorp/consul/sdk => github.com/hashicorp/consul/sdk v0.16.0
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.19.0
 	golang.org/x/crypto => golang.org/x/crypto v0.23.0
-	golang.org/x/net => golang.org/x/net v0.24.0
+	golang.org/x/net => golang.org/x/net v0.25.0
 	google.golang.org/grpc => google.golang.org/grpc v1.63.2
 )
