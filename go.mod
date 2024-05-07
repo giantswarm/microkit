@@ -43,8 +43,8 @@ require (
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/resty.v1 v1.12.0 // indirect
@@ -53,7 +53,7 @@ require (
 replace (
 	github.com/hashicorp/consul/sdk => github.com/hashicorp/consul/sdk v0.16.0
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.19.0
-	golang.org/x/crypto => golang.org/x/crypto v0.22.0
+	golang.org/x/crypto => golang.org/x/crypto v0.23.0
 	golang.org/x/net => golang.org/x/net v0.24.0
 	google.golang.org/grpc => google.golang.org/grpc v1.63.2
 )
