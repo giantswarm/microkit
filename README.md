@@ -2,6 +2,8 @@
 
 # microkit
 
+**:warning: Important: This library has been deprecated in favor of other project's defaults. Please, do not use this library in new projects.**
+
 The microkit package implements an opinionated microservice framework which can
 be used as library in golang microservices to speed up development. See the
 example microservice using the microkit package:
