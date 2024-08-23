@@ -8,7 +8,7 @@ require (
 	github.com/giantswarm/versionbundle v1.1.0
 	github.com/go-kit/kit v0.13.0
 	github.com/gorilla/mux v1.8.1
-	github.com/prometheus/client_golang v1.20.0
+	github.com/prometheus/client_golang v1.20.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
@@ -54,7 +54,7 @@ require (
 
 replace (
 	github.com/hashicorp/consul/sdk => github.com/hashicorp/consul/sdk v0.16.1
-	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.20.0
+	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.20.1
 	golang.org/x/crypto => golang.org/x/crypto v0.26.0
 	golang.org/x/net => golang.org/x/net v0.28.0
 	google.golang.org/grpc => google.golang.org/grpc v1.65.0
