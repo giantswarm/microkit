@@ -112,14 +112,14 @@ func New(config Config) (Server, error) {
 
 	listenURL, err := url.Parse(config.ListenAddress)
 	if err != nil {
-		return nil, microerror.Maskf(invalidConfigError, err.Error())
+		return nil, microerror.Maskf(invalidConfigError, "%s", err.Error())
 	}
 
 	var listenMetricsURL *url.URL
 	if config.ListenMetricsAddress != "" {
 		listenMetricsURL, err = url.Parse(config.ListenMetricsAddress)
 		if err != nil {
-			return nil, microerror.Maskf(invalidConfigError, err.Error())
+			return nil, microerror.Maskf(invalidConfigError, "%s", err.Error())
 		}
 
 		// Check if the user supplied a https scheme for the optional metrics endpoint
