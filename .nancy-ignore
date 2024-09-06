@@ -1,1 +1,1 @@
-CVE-2024-24786 until=2024-05-09 # google.golang.org/protobuf@v1.31.0
+CVE-2024-8421 until=2024-10-30 # pkg:golang/golang.org/x/net@v0.29.0
