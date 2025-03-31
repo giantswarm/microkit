@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"os"
+	"path/filepath"
 
 	"github.com/giantswarm/microerror"
 )
@@ -52,6 +53,7 @@ func LoadTLSConfig(files CertFiles) (*tls.Config, error) {
 		rootCAs = x509.NewCertPool()
 
 		for _, caFile := range files.RootCAs {
+			caFile = filepath.Clean(caFile)
 			pemByte, err := os.ReadFile(caFile)
 			if err != nil {
 				return nil, microerror.Mask(err)

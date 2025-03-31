@@ -219,7 +219,7 @@ func (s *server) Boot() {
 					defer func(t time.Time) {
 						endpointCode := strconv.Itoa(responseWriter.StatusCode())
 						endpointMethod := strings.ToLower(e.Method())
-						endpointName := strings.Replace(e.Name(), "/", "_", -1)
+						endpointName := strings.ReplaceAll(e.Name(), "/", "_")
 
 						if s.logAccess {
 							s.logger.Log("code", endpointCode, "endpoint", e.Name(), "level", "debug", "message", "tracking access log", "method", endpointMethod, "path", r.URL.Path)
