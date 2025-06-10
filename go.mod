@@ -51,6 +51,6 @@ require (
 replace (
 	github.com/hashicorp/consul/sdk => github.com/hashicorp/consul/sdk v0.16.2
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.22.0
-	golang.org/x/crypto => golang.org/x/crypto v0.38.0
+	golang.org/x/crypto => golang.org/x/crypto v0.39.0
 	golang.org/x/net => golang.org/x/net v0.41.0
 )
