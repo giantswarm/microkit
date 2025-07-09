@@ -2,7 +2,7 @@ module github.com/giantswarm/microkit
 
 go 1.23.0
 
-toolchain go1.24.4
+toolchain go1.24.5
 
 require (
 	github.com/giantswarm/microerror v0.4.1
