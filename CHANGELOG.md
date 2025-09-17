@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Replace gopkg.in/yaml.v3 with go.yaml.in/yaml/v3
+
 ## [1.0.3] - 2025-02-20
 
 - Dependency updates
