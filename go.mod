@@ -50,5 +50,5 @@ require (
 replace (
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.23.2
 	golang.org/x/crypto => golang.org/x/crypto v0.47.0
-	golang.org/x/net => golang.org/x/net v0.48.0
+	golang.org/x/net => golang.org/x/net v0.49.0
 )
