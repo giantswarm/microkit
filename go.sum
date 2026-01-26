@@ -15,8 +15,8 @@ github.com/giantswarm/microerror v0.4.1 h1:WMiD7HQASoUA9lZzPlPK+erCEOJ0uT4cyo18V
 github.com/giantswarm/microerror v0.4.1/go.mod h1:URFj0gFCmZihjya6saQCXxslBrgctXb4NsXYHB5JdrI=
 github.com/giantswarm/micrologger v1.1.2 h1:dNmnGZgAT0rnZkpc2ivj1shJ3Stnnjsy7jIi84//Jqc=
 github.com/giantswarm/micrologger v1.1.2/go.mod h1:lJe2gBm3O3miycXjWOgDh6vVuaKCACsPjBcobc0dvPM=
-github.com/giantswarm/versionbundle v1.1.0 h1:Fk0UWTMnA56voTh5P/LmLLPbAkEkFE5jKKpVzcMOL1A=
-github.com/giantswarm/versionbundle v1.1.0/go.mod h1:+sEGkxho1b7UYid1F9+xIAoRWiZ4Wyrh6P5a6hxgtWc=
+github.com/giantswarm/versionbundle v1.2.0 h1:bRXX+vR1UeB8gajGZiLphE/by/1WupdEyGi/kwCwbVI=
+github.com/giantswarm/versionbundle v1.2.0/go.mod h1:+sEGkxho1b7UYid1F9+xIAoRWiZ4Wyrh6P5a6hxgtWc=
 github.com/go-kit/kit v0.13.0 h1:OoneCcHKHQ03LfBpoQCUfCluwd2Vt3ohz+kvbJneZAU=
 github.com/go-kit/kit v0.13.0/go.mod h1:phqEHMMUbyrCFCTgH48JueqrM3md2HcAZ8N3XE4FKDg=
 github.com/go-kit/log v0.2.1 h1:MRVx0/zhvdseW+Gza6N9rVzU/IVzaeE1SFI4raAhmBU=
