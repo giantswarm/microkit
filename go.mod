@@ -52,3 +52,11 @@ replace (
 	golang.org/x/crypto => golang.org/x/crypto v0.50.0
 	golang.org/x/net => golang.org/x/net v0.53.0
 )
+
+replace github.com/nats-io/nats-server/v2 v2.8.4 => github.com/nats-io/nats-server/v2 v2.14.2
+
+replace github.com/sirupsen/logrus v1.8.1 => github.com/sirupsen/logrus v1.9.4
+
+replace github.com/yuin/goldmark v1.4.13 => github.com/yuin/goldmark v1.8.2
+
+replace google.golang.org/grpc v1.40.0 => google.golang.org/grpc v1.81.1
