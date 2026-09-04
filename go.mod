@@ -1,6 +1,6 @@
 module github.com/giantswarm/microkit
 
-go 1.25.0
+go 1.26.0
 
 toolchain go1.26.6
 
@@ -38,17 +38,17 @@ require (
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/spf13/cast v1.10.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	golang.org/x/net v0.57.0 // indirect
+	golang.org/x/net v0.58.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/text v0.40.0 // indirect
+	golang.org/x/text v0.41.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/resty.v1 v1.12.0 // indirect
 )
 
 replace (
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.24.1
-	golang.org/x/crypto => golang.org/x/crypto v0.53.0
+	golang.org/x/crypto => golang.org/x/crypto v0.56.0
 	golang.org/x/net => golang.org/x/net v0.53.0
 )
 
