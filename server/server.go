@@ -25,6 +25,10 @@ import (
 	"github.com/giantswarm/microkit/tls"
 )
 
+// responseKeyCode is the field of a JSON error response that carries the
+// error code.
+const responseKeyCode = "code"
+
 type Config struct {
 	// ErrorEncoder is the server's error encoder. This wraps the error encoder
 	// configured by the client. Clients should not implement error logging in
@@ -430,9 +434,9 @@ func (s *server) newErrorEncoderWrapper() kithttp.ErrorEncoder {
 		// inside the error encoder.
 		if !rw.HasWritten() {
 			err := json.NewEncoder(rw).Encode(map[string]interface{}{
-				"code":  responseError.Code(),
-				"error": responseError.Message(),
-				"from":  s.serviceName,
+				responseKeyCode: responseError.Code(),
+				"error":         responseError.Message(),
+				"from":          s.serviceName,
 			})
 			if err != nil {
 				panic(err)
@@ -467,9 +471,9 @@ func (s *server) newNotFoundHandler() http.Handler {
 		w.WriteHeader(http.StatusNotFound)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		err := json.NewEncoder(w).Encode(map[string]interface{}{
-			"code":  CodeResourceNotFound,
-			"error": errMessage,
-			"from":  s.serviceName,
+			responseKeyCode: CodeResourceNotFound,
+			"error":         errMessage,
+			"from":          s.serviceName,
 		})
 		if err != nil {
 			panic(err)
