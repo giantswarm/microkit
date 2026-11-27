@@ -2,7 +2,7 @@
 #
 #    devctl
 #
-#    https://github.com/giantswarm/devctl/blob/6bd76e24b11b67d6d99715b8f484f454e05abbd9/pkg/gen/input/workflows/internal/file/semantic_pull_request.yaml.template
+#    https://github.com/giantswarm/devctl/blob/d4a0ced01fc090900a2720c7cc0f413f46a707cf/pkg/gen/input/workflows/internal/file/semantic_pull_request.yaml.template
 #
 name: semantic-pull-request
 
@@ -15,6 +15,16 @@ on:
   merge_group: {}
 
 permissions: {}
+
+# GitHub judges this check on a commit by the workflow's newest run, and a run
+# checks the title it reads when its job starts. A newer run cancels an older
+# one, so no run that read an older title finishes after it. An edit that
+# leaves the title alone (the description, the base) gets a group of its own:
+# it cancels nothing and checks the same title. It still runs the job: a
+# skipped newest run would count as green over a failed title check.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}${{ github.event.action == 'edited' && github.event.changes.title == null && format('-{0}', github.run_id) || '' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   semantic-pull-request:
