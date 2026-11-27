@@ -7,6 +7,13 @@ linters:
   enable:
     - gosec
     - goconst
+  exclusions:
+    rules:
+      # Tests repeat fixture values on purpose; constants for them would make
+      # each case harder to read. goconst still checks the non-test code.
+      - path: _test\.go
+        linters:
+          - goconst
 
 issues:
   max-issues-per-linter: 0
